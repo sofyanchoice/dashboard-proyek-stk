@@ -138,7 +138,13 @@
 
 <!-- LOGIN GATE -->
 <div id="loginGate">
-  <div class="login-card">
+  <!-- Ditampilkan saat mengecek sesi tersimpan — sebelum tahu perlu login ulang atau tidak -->
+  <div id="authChecking" class="text-center">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3 text-muted fw-semibold mb-0">Memeriksa sesi...</p>
+  </div>
+
+  <div class="login-card d-none" id="loginCardWrapper">
     <div class="icon-badge"><img src="logo.png" alt="Logo Selaras Tirta Karya"></div>
     <h4>Dashboard Proyek STK</h4>
     <p class="login-subtitle">Daftar Proyek CV.Selaras Tirta Karya</p>
@@ -452,24 +458,31 @@ async function attemptAutoLogin() {
   const remember = localStorage.getItem(REMEMBER_KEY) === '1';
   const storage  = remember ? localStorage : sessionStorage;
   const token    = storage.getItem(TOKEN_KEY);
-  if (!token) { showLoginGate(); return; }
+  // Tidak ada token tersimpan sama sekali -> langsung tampilkan form, tidak perlu spinner
+  if (!token) { showLoginForm(); return; }
 
+  // Ada token -> tetap tampilkan spinner "Memeriksa sesi..." selama validasi berlangsung
   try {
     const r = await api('validateToken', { token });
     if (r && r.valid) {
       authToken = token; currentRole = r.role; isAdmin = r.role === 'admin';
       hideLoginGate(); onAuthenticated();
-    } else { clearStoredAuth(); showLoginGate(); }
-  } catch (_) { showLoginGate(); }
+    } else { clearStoredAuth(); showLoginForm(); }
+  } catch (_) { showLoginForm(); }
 }
 
 function showLoginGate() {
   document.getElementById('loginGate').classList.remove('d-none');
   document.getElementById('appRoot').style.display = 'none';
+  showLoginForm();
 }
 function hideLoginGate() {
   document.getElementById('loginGate').classList.add('d-none');
   document.getElementById('appRoot').style.display = '';
+}
+function showLoginForm() {
+  document.getElementById('authChecking').classList.add('d-none');
+  document.getElementById('loginCardWrapper').classList.remove('d-none');
 }
 
 async function submitLogin(e) {
