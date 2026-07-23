@@ -115,12 +115,26 @@
     .login-card .form-check-label{font-size:.88rem;color:var(--ink-soft);}
     @media(max-width:420px){.login-card{padding:26px 20px;}}
 
-    /* ── gas URL banner ── */
+    /* ── GAS URL banner ── */
     #gasBanner{background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:.88rem;display:none;}
     #gasBanner.show{display:block;}
+
+    /* ── Global loading overlay (mengunci seluruh interaksi saat proses berjalan) ── */
+    #globalLoadingOverlay{position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.55);backdrop-filter:blur(1px);display:none;align-items:center;justify-content:center;cursor:wait;}
+    #globalLoadingOverlay.active{display:flex;}
+    #globalLoadingOverlay .loading-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 32px;box-shadow:0 12px 32px rgba(15,23,42,.14);display:flex;align-items:center;gap:14px;}
+    #globalLoadingOverlay .loading-box span{font-weight:700;color:var(--ink);font-size:.92rem;}
   </style>
 </head>
 <body>
+
+<!-- Overlay pengunci global — muncul saat tambah/edit/hapus/reorder/batch sedang diproses -->
+<div id="globalLoadingOverlay">
+  <div class="loading-box">
+    <div class="spinner-border text-primary" role="status"></div>
+    <span id="globalLoadingText">Memproses...</span>
+  </div>
+</div>
 
 <!-- LOGIN GATE -->
 <div id="loginGate">
@@ -368,7 +382,7 @@
 // ============================================================
 // ⚙️  KONFIGURASI — ISI URL APPS SCRIPT KAMU DI SINI
 // ============================================================
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz4Pa9Nh-Z6JvsTtpbgoXBPelpQAO-v0H_-1CO07WRWIWPA6ssLtx5ZHfDZUcmuwpI3gA/exec';
+const GAS_URL = 'GANTI_DENGAN_URL_DEPLOY_APPS_SCRIPT_KAMU';
 // Contoh:
 // const GAS_URL = 'https://script.google.com/macros/s/AKfycbxxxxxx/exec';
 // ============================================================
@@ -591,6 +605,20 @@ async function submitChangeCred(e) {
   btn.innerHTML = '<i class="bi bi-save me-1"></i> Simpan';
 }
 
+// ── Global loading overlay (mengunci interaksi lain saat proses berjalan) ──
+let globalLoadingCount = 0;
+function showGlobalLoading(text) {
+  globalLoadingCount++;
+  document.getElementById('globalLoadingText').textContent = text || 'Memproses...';
+  document.getElementById('globalLoadingOverlay').classList.add('active');
+}
+function hideGlobalLoading() {
+  globalLoadingCount = Math.max(0, globalLoadingCount - 1);
+  if (globalLoadingCount === 0) {
+    document.getElementById('globalLoadingOverlay').classList.remove('active');
+  }
+}
+
 // ── Loading / empty ─────────────────────────────────────────
 function showLoading() {
   document.getElementById('tableBody').innerHTML =
@@ -682,6 +710,7 @@ async function submitData(e) {
   e.preventDefault(); if (!isAdmin) return;
   const btn = document.getElementById('btnSubmit');
   btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+  showGlobalLoading('Menyimpan data...');
   try {
     const d = await api('saveData', {
       sheetName: activeSheet, no: '', token: authToken,
@@ -696,6 +725,7 @@ async function submitData(e) {
     });
     cache[activeSheet] = d; renderTable(d); collapseAddForm();
   } catch (err) { alert('Gagal menyimpan: ' + err.message); }
+  hideGlobalLoading();
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-save me-1"></i> Simpan Data';
 }
 
@@ -730,6 +760,7 @@ async function submitEditData(e) {
   e.preventDefault(); if (!isAdmin) return;
   const btn = document.getElementById('btnEditSubmit');
   btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+  showGlobalLoading('Menyimpan perubahan...');
   try {
     const d = await api('saveData', {
       sheetName: activeSheet, token: authToken,
@@ -745,6 +776,7 @@ async function submitEditData(e) {
     });
     cache[activeSheet] = d; renderTable(d); editModal.hide();
   } catch (err) { alert('Gagal: ' + err.message); }
+  hideGlobalLoading();
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-save me-1"></i> Update Data';
 }
 
@@ -757,10 +789,12 @@ async function deleteFromModal() {
     const el = document.getElementById(id); if (el) el.disabled = true;
   });
   document.getElementById('btnDeleteRow').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menghapus...';
+  showGlobalLoading('Menghapus data...');
   try {
     const d = await api('deleteData', { sheetName: activeSheet, no, token: authToken });
     cache[activeSheet] = d; clearSelection(); renderTable(d); editModal.hide();
   } catch (err) { alert('Gagal: ' + err.message); }
+  hideGlobalLoading();
   isDeletingRow = false;
   ['btnDeleteRow','btnEditSubmit','btnEditCancel','btnEditCloseX'].forEach(id => {
     const el = document.getElementById(id); if (el) el.disabled = false;
@@ -794,10 +828,12 @@ async function submitMoveRow(e) {
   }
   const btn = document.getElementById('btnMoveSubmit');
   btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memindahkan...';
+  showGlobalLoading('Memindahkan urutan data...');
   try {
     const d = await api('reorder', { sheetName: activeSheet, fromNo, toNo, token: authToken });
     cache[activeSheet] = d; clearSelection(); renderTable(d); moveModal.hide();
   } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+  hideGlobalLoading();
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrows-move me-1"></i> Pindahkan';
 }
 
@@ -872,6 +908,7 @@ async function batchApply() {
   if (!sv && !cv && !uv) { alert('Pilih perubahan terlebih dahulu.'); return; }
   const btn = document.getElementById('btnBatchApply');
   btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menerapkan...';
+  showGlobalLoading('Menerapkan perubahan batch...');
   try {
     const d = await api('batchUpdate', {
       sheetName: activeSheet, nos: [...selectedRows], token: authToken,
@@ -883,6 +920,7 @@ async function batchApply() {
     ['batchStatus','batchCollected','batchUploaded'].forEach(id => document.getElementById(id).value='');
     updateBatchToolbar();
   } catch (err) { alert('Gagal: ' + err.message); }
+  hideGlobalLoading();
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-all me-1"></i> Terapkan';
 }
 
