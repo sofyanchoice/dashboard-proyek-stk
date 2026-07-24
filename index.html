@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
   <style>
-    :root{--ink:#1e293b;--ink-soft:#64748b;--line:#e2e8f0;--surface:#fff;--canvas:#f1f5f9;--brand:#2563eb;--brand-soft:#eff6ff;--done:#16a34a;--done-soft:#ecfdf3;--ongoing:#d97706;--ongoing-soft:#fffbeb;--user-c:#7c3aed;--user-soft:#f5f3ff;--danger:#dc2626;--sidebar-w:250px;}
+    :root{--ink:#1e293b;--ink-soft:#64748b;--line:#e2e8f0;--surface:#fff;--canvas:#f1f5f9;--brand:#2563eb;--brand-soft:#eff6ff;--done:#16a34a;--done-soft:#ecfdf3;--ongoing:#d97706;--ongoing-soft:#fffbeb;--user-c:#7c3aed;--user-soft:#f5f3ff;--danger:#dc2626;--sidebar-w:250px;--sidebar-w-collapsed:76px;}
     *{box-sizing:border-box;}
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--canvas);color:var(--ink);margin:0;}
     .subtitle{color:var(--ink-soft);font-size:.9rem;margin:0;}
@@ -19,41 +19,63 @@
     .app-shell{display:flex;min-height:100vh;}
     .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:1035;}
     .sidebar-backdrop.show{display:block;}
-    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:1040;transition:transform .25s ease;}
-    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--line);}
+    .sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--line);position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:1040;transition:width .22s ease,transform .25s ease;overflow:hidden;}
+    .sidebar-brand{display:flex;align-items:center;gap:10px;padding:20px 18px;border-bottom:1px solid var(--line);position:relative;}
     .sidebar-brand img{height:38px;width:auto;flex-shrink:0;}
-    .sidebar-brand .brand-text{font-weight:800;font-size:.86rem;line-height:1.25;color:var(--ink);}
-    .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;}
-    .sidebar-nav .nav-section-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);padding:8px 14px 6px;}
-    .nav-item-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--ink-soft);font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:3px;transition:all .15s;user-select:none;}
+    .sidebar-brand .brand-text{font-weight:800;font-size:.86rem;line-height:1.25;color:var(--ink);white-space:nowrap;}
+    .sidebar-collapse-btn{position:absolute;top:50%;right:-13px;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);cursor:pointer;z-index:5;box-shadow:0 2px 6px rgba(15,23,42,.08);transition:transform .2s;}
+    .sidebar-collapse-btn:hover{color:var(--brand);border-color:var(--brand);}
+    .sidebar.collapsed .sidebar-collapse-btn i{transform:rotate(180deg);}
+    .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;overflow-x:hidden;}
+    .sidebar-nav .nav-section-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);padding:8px 14px 6px;white-space:nowrap;}
+    .nav-item-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--ink-soft);font-weight:600;font-size:.9rem;cursor:pointer;margin-bottom:3px;transition:all .15s;user-select:none;white-space:nowrap;}
     .nav-item-link:hover{background:var(--canvas);color:var(--ink);}
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
-    .sidebar-account{border-top:1px solid var(--line);padding:14px 10px;}
-    .account-menu-wrap{position:relative;}
-    .account-toggle-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.85rem;color:var(--ink);cursor:pointer;}
-    .account-toggle-btn:hover{background:var(--canvas);}
-    .account-toggle-btn .account-toggle-icon{font-size:1.2rem;color:var(--ink-soft);flex-shrink:0;}
-    .account-toggle-btn .account-toggle-label{flex:1;text-align:left;overflow:hidden;}
-    .account-toggle-btn .account-toggle-chevron{color:var(--ink-soft);transition:transform .2s;flex-shrink:0;}
-    .account-toggle-btn.open .account-toggle-chevron{transform:rotate(180deg);}
-    .account-menu-popup{position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(15,23,42,.16);padding:6px;display:none;flex-direction:column;gap:2px;}
-    .account-menu-popup.open{display:flex;}
-    .account-menu-popup .nav-item-link{margin-bottom:0;}
+    .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;}
     .sidebar-toggle-btn{display:none;}
 
-    .main-wrapper{margin-left:var(--sidebar-w);flex:1;min-width:0;padding:24px;}
+    /* Collapsed sidebar state (desktop) */
+    .sidebar.collapsed{width:var(--sidebar-w-collapsed);}
+    .sidebar.collapsed .sidebar-brand{padding:20px 0;justify-content:center;}
+    .sidebar.collapsed .brand-text,
+    .sidebar.collapsed .nav-section-label,
+    .sidebar.collapsed .nav-item-link span.link-label,
+    .sidebar.collapsed .account-trigger .account-label-block,
+    .sidebar.collapsed .account-trigger i.bi-chevron-up{display:none;}
+    .sidebar.collapsed .nav-item-link{justify-content:center;padding:11px 0;}
+    .sidebar.collapsed .nav-item-link i{width:auto;}
+    .sidebar.collapsed .account-trigger{justify-content:center;padding:10px 0;}
+    .sidebar.collapsed .account-menu{left:8px;right:8px;}
+
+    .main-wrapper{margin-left:var(--sidebar-w);flex:1;min-width:0;padding:24px;transition:margin-left .22s ease;}
+    .sidebar.collapsed ~ .main-wrapper{margin-left:var(--sidebar-w-collapsed);}
     .app-topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
     @media(max-width:900px){
-      .sidebar{transform:translateX(-100%);}
+      .sidebar{transform:translateX(-100%);width:var(--sidebar-w) !important;}
       .sidebar.open{transform:translateX(0);}
-      .main-wrapper{margin-left:0;padding:14px;}
+      .sidebar.collapsed .brand-text,.sidebar.collapsed .nav-section-label,.sidebar.collapsed .nav-item-link span.link-label,.sidebar.collapsed .account-trigger .account-label-block,.sidebar.collapsed .account-trigger i.bi-chevron-up{display:revert;}
+      .sidebar.collapsed .nav-item-link{justify-content:flex-start;padding:11px 14px;}
+      .sidebar-collapse-btn{display:none;}
+      .main-wrapper{margin-left:0 !important;padding:14px;}
       .sidebar-toggle-btn{display:inline-flex;}
     }
 
     .role-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;font-weight:700;font-size:.82rem;white-space:nowrap;}
     .role-badge.admin{background:var(--done-soft);color:var(--done);}
     .role-badge.user{background:var(--user-soft);color:var(--user-c);}
+
+    /* ── Account menu (collapsible, opens upward) ── */
+    .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
+    .account-trigger:hover{background:var(--canvas);}
+    .account-trigger .account-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-size:1.05rem;}
+    .account-trigger .account-label-block{flex:1;min-width:0;}
+    .account-trigger .account-label-block .acc-name{font-weight:700;font-size:.85rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .account-trigger i.bi-chevron-up{transition:transform .2s;color:var(--ink-soft);flex-shrink:0;}
+    .sidebar-account.open .account-trigger i.bi-chevron-up{transform:rotate(180deg);}
+    .account-menu{position:absolute;left:10px;right:10px;bottom:100%;margin-bottom:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(15,23,42,.14);padding:6px;display:none;flex-direction:column;gap:2px;}
+    .sidebar-account.open .account-menu{display:flex;}
+    .account-menu .nav-item-link{margin-bottom:0;}
 
     /* ── Cards ── */
     .card{border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:20px;background:var(--surface);}
@@ -75,7 +97,7 @@
     @media(max-width:768px){.search-box{width:100%;}.card-header.d-flex{flex-direction:column;align-items:stretch!important;gap:10px;}}
 
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
-    #dataTable{table-layout:auto;width:100%;min-width:800px;margin-bottom:0;}
+    #dataTable{table-layout:auto;width:100%;min-width:860px;margin-bottom:0;}
     #dataTable th,#dataTable td{white-space:normal;word-wrap:break-word;vertical-align:middle;padding:12px 14px;font-size:.9rem;}
     #dataTable thead th{position:sticky;top:0;z-index:2;background:#f8fafc;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
     #dataTable tbody tr:hover{background:#f8fafc;}
@@ -83,8 +105,9 @@
     @media(max-width:576px){#dataTable th,#dataTable td{padding:10px;font-size:.83rem;}}
 
     .sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+    .sortable .th-inner{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
     .sortable:hover{color:var(--brand);}
-    .sort-icon{margin-left:4px;font-size:.72rem;opacity:.4;vertical-align:1px;}
+    .sort-icon{font-size:.72rem;opacity:.4;flex-shrink:0;}
     .sortable:hover .sort-icon{opacity:.75;}
     .sort-icon.active{opacity:1;color:var(--brand);}
 
@@ -96,29 +119,36 @@
     .batch-toolbar .batch-count{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:6px 12px;border-radius:8px;font-size:.85rem;white-space:nowrap;}
     .batch-toolbar select{border-radius:8px;border-color:var(--line);font-size:.85rem;padding:6px 10px;}
 
-    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-weight:700;font-size:.78rem;white-space:nowrap;}
+    .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-weight:700;font-size:.78rem;white-space:nowrap;border:none;cursor:pointer;}
     .status-pill.done{background:var(--done-soft);color:var(--done);}
     .status-pill.ongoing{background:var(--ongoing-soft);color:var(--ongoing);}
+    .status-pill.editable:hover{filter:brightness(0.96);box-shadow:0 0 0 2px rgba(0,0,0,.05) inset;}
     .checklist-icons{display:flex;align-items:center;justify-content:center;gap:10px;}
     .checklist-icons i{font-size:1.15rem;}
+    .checklist-icons i.editable{cursor:pointer;transition:transform .1s;}
+    .checklist-icons i.editable:hover{transform:scale(1.15);}
     .btn-edit-row{border:1px solid var(--line);background:var(--surface);color:var(--brand);width:34px;height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;}
     .btn-edit-row:hover{background:var(--brand-soft);}
 
     /* ── PIC Avatars ── */
     .pic-avatars{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
     .pic-avatar-group{display:flex;align-items:center;}
-    .pic-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;border:2px solid var(--surface);}
+    .pic-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;border:2px solid var(--surface);cursor:default;}
     .pic-avatar-group .pic-avatar:not(:first-child){margin-left:-8px;}
-    .pic-names{font-size:.85rem;color:var(--ink);}
 
     /* ── Modals ── */
-    .modal-content{border-radius:14px;border:none;}
+    .modal-content{border-radius:14px;border:none;box-shadow:0 20px 60px rgba(15,23,42,.28);}
     .modal-header{border-bottom:1px solid var(--line);}
     .modal-footer{border-top:1px solid var(--line);}
     .password-field{position:relative;}
     .password-field input{padding-right:42px;}
     .password-toggle-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:transparent;color:var(--ink-soft);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;}
     .password-toggle-btn:hover{background:var(--canvas);color:var(--ink);}
+
+    /* Confirm/warning modal accent so it's visible against white */
+    #confirmModal .modal-content{border:1px solid var(--line);}
+    #confirmModal .modal-content.is-danger{border-top:4px solid var(--danger);}
+    #confirmModal .modal-content.is-primary{border-top:4px solid var(--brand);}
 
     /* ── Login gate ── */
     #loginGate{position:fixed;inset:0;z-index:1050;background:linear-gradient(160deg,#eef2ff 0%,var(--canvas) 55%);display:flex;align-items:center;justify-content:center;padding:20px;}
@@ -194,10 +224,11 @@
     @keyframes toastIn{from{opacity:0;transform:translateX(24px);}to{opacity:1;transform:translateX(0);}}
     @keyframes toastOut{to{opacity:0;transform:translateX(24px);}}
 
-    /* ── Inline alert box (pesan error/sukses di dalam modal/form) ── */
-    .inline-alert{display:block;padding:10px 14px;border-radius:8px;font-size:.83rem;font-weight:600;border:1px solid;box-shadow:0 2px 8px rgba(15,23,42,.06);}
-    .inline-alert.text-danger{background:#fef2f2;border-color:#fecaca;color:#b91c1c !important;}
-    .inline-alert.text-success{background:var(--done-soft);border-color:#bbf7d0;color:#15803d !important;}
+    /* ── Inline edit popovers (status / checklist) ── */
+    .inline-edit-pop{position:absolute;z-index:1600;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(15,23,42,.16);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:150px;}
+    .inline-edit-pop button{display:flex;align-items:center;gap:8px;border:none;background:transparent;text-align:left;padding:8px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;}
+    .inline-edit-pop button:hover{background:var(--canvas);}
+    .inline-edit-pop button.active{background:var(--brand-soft);color:var(--brand);}
   </style>
 </head>
 <body>
@@ -241,7 +272,7 @@
         <input class="form-check-input" type="checkbox" id="rememberMe">
         <label class="form-check-label" for="rememberMe">Ingat saya di perangkat ini (30 hari)</label>
       </div>
-      <div class="text-danger small mb-2 inline-alert" id="loginError" style="display:none;"></div>
+      <div class="text-danger small mb-2" id="loginError" style="display:none;"></div>
       <button type="submit" class="btn btn-primary w-100" id="btnLoginSubmit">
         <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
       </button>
@@ -262,23 +293,17 @@
     <div class="sidebar-brand">
       <img src="logo.png" alt="Logo STK">
       <div class="brand-text">Dashboard Proyek<br>CV. Selaras Tirta Karya</div>
+      <div class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Ciutkan sidebar">
+        <i class="bi bi-chevron-left"></i>
+      </div>
     </div>
     <div class="sidebar-nav">
       <div class="nav-section-label">Halaman</div>
-      <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> Dashboard</div>
-      <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> Pekerjaan</div>
-      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> USTEK</div>
+      <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
+      <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
+      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
     </div>
-    <div class="sidebar-account">
-      <div class="account-menu-wrap" id="accountMenuWrap">
-        <div class="account-menu-popup" id="accountMenuPopup"></div>
-        <button type="button" class="account-toggle-btn" id="accountToggleBtn" onclick="toggleAccountMenu()">
-          <span class="account-toggle-icon"><i class="bi bi-person-circle"></i></span>
-          <span class="account-toggle-label" id="accountToggleLabel"></span>
-          <i class="bi bi-chevron-up account-toggle-chevron"></i>
-        </button>
-      </div>
-    </div>
+    <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
 
   <!-- MAIN CONTENT -->
@@ -376,14 +401,14 @@
               <thead>
                 <tr>
                   <th class="text-center" id="thSelect"><input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)"></th>
-                  <th class="text-center sortable" onclick="sortByColumn(0,'number')">No <i class="bi bi-arrow-down-up sort-icon" data-col-icon="0"></i></th>
-                  <th class="sortable" onclick="sortByColumn(1,'string')">Judul Pekerjaan <i class="bi bi-arrow-down-up sort-icon" data-col-icon="1"></i></th>
-                  <th class="text-center sortable" onclick="sortByColumn(2,'number')">Tahun <i class="bi bi-arrow-down-up sort-icon" data-col-icon="2"></i></th>
-                  <th class="sortable" onclick="sortByColumn(3,'string')">Jenis <i class="bi bi-arrow-down-up sort-icon" data-col-icon="3"></i></th>
-                  <th class="sortable" onclick="sortByColumn(4,'string')">PIC <i class="bi bi-arrow-down-up sort-icon" data-col-icon="4"></i></th>
-                  <th class="text-center sortable" onclick="sortByColumn(5,'string')">Status <i class="bi bi-arrow-down-up sort-icon" data-col-icon="5"></i></th>
-                  <th class="text-center sortable" onclick="sortByColumn(6,'checklist')">Checklist <i class="bi bi-arrow-down-up sort-icon" data-col-icon="6"></i></th>
-                  <th class="sortable" onclick="sortByColumn(8,'string')">Keterangan <i class="bi bi-arrow-down-up sort-icon" data-col-icon="8"></i></th>
+                  <th class="text-center sortable" onclick="sortByColumn(0,'number')"><span class="th-inner">No <i class="bi bi-arrow-down-up sort-icon" data-col-icon="0"></i></span></th>
+                  <th class="sortable" onclick="sortByColumn(1,'string')"><span class="th-inner">Judul Pekerjaan <i class="bi bi-arrow-down-up sort-icon" data-col-icon="1"></i></span></th>
+                  <th class="text-center sortable" onclick="sortByColumn(2,'number')"><span class="th-inner">Tahun <i class="bi bi-arrow-down-up sort-icon" data-col-icon="2"></i></span></th>
+                  <th class="sortable" onclick="sortByColumn(3,'string')"><span class="th-inner">Jenis <i class="bi bi-arrow-down-up sort-icon" data-col-icon="3"></i></span></th>
+                  <th class="sortable" onclick="sortByColumn(4,'string')"><span class="th-inner">PIC <i class="bi bi-arrow-down-up sort-icon" data-col-icon="4"></i></span></th>
+                  <th class="text-center sortable" onclick="sortByColumn(5,'string')"><span class="th-inner">Status <i class="bi bi-arrow-down-up sort-icon" data-col-icon="5"></i></span></th>
+                  <th class="text-center sortable" onclick="sortByColumn(6,'checklist')"><span class="th-inner">Checklist <i class="bi bi-arrow-down-up sort-icon" data-col-icon="6"></i></span></th>
+                  <th class="sortable" onclick="sortByColumn(8,'string')"><span class="th-inner">Keterangan <i class="bi bi-arrow-down-up sort-icon" data-col-icon="8"></i></span></th>
                   <th class="text-center" id="thAksi">Aksi</th>
                 </tr>
               </thead>
@@ -434,7 +459,7 @@
 </div>
 
 <!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1">
+<div class="modal fade" id="editModal" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <form id="editForm" onsubmit="submitEditData(event)">
@@ -480,7 +505,7 @@
 </div>
 
 <!-- Ubah Kredensial Modal -->
-<div class="modal fade" id="credModal" tabindex="-1">
+<div class="modal fade" id="credModal" tabindex="-1" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form id="credForm" onsubmit="submitChangeCred(event)">
@@ -496,8 +521,8 @@
             <div class="col-md-6"><label class="form-label">Username baru</label><input type="text" class="form-control" id="cred_newUser" required></div>
             <div class="col-md-6"><label class="form-label">Password baru</label><div class="password-field"><input type="password" class="form-control" id="cred_newPass" required minlength="4"><button type="button" class="password-toggle-btn" onclick="togglePwd('cred_newPass',this)"><i class="bi bi-eye"></i></button></div></div>
           </div>
-          <div class="text-danger small mt-3 inline-alert" id="credErr" style="display:none;"></div>
-          <div class="text-success small mt-3 inline-alert" id="credOk" style="display:none;"></div>
+          <div class="text-danger small mt-3" id="credErr" style="display:none;"></div>
+          <div class="text-success small mt-3" id="credOk" style="display:none;"></div>
         </div>
         <div class="modal-footer"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Tutup</button><button type="submit" class="btn btn-primary" id="btnCredSubmit"><i class="bi bi-save me-1"></i> Simpan</button></div>
       </form>
@@ -506,7 +531,7 @@
 </div>
 
 <!-- Ubah Urutan Modal -->
-<div class="modal fade" id="moveModal" tabindex="-1">
+<div class="modal fade" id="moveModal" tabindex="-1" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form id="moveForm" onsubmit="submitMoveRow(event)">
@@ -518,7 +543,7 @@
             <div class="col-6"><label class="form-label">Nomor urut saat ini</label><input type="text" class="form-control" id="move_currentNo" disabled></div>
             <div class="col-6"><label class="form-label">Pindah ke nomor urut</label><input type="number" class="form-control" id="move_toNo" min="1" required></div>
           </div>
-          <div class="text-danger small mt-3 inline-alert" id="moveErr" style="display:none;"></div>
+          <div class="text-danger small mt-3" id="moveErr" style="display:none;"></div>
         </div>
         <div class="modal-footer"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary" id="btnMoveSubmit"><i class="bi bi-arrows-move me-1"></i> Pindahkan</button></div>
       </form>
@@ -527,7 +552,7 @@
 </div>
 
 <!-- Confirm Modal (pengganti confirm() bawaan browser) -->
-<div class="modal fade" id="confirmModal" tabindex="-1">
+<div class="modal fade" id="confirmModal" tabindex="-1" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -561,14 +586,36 @@ let isAdmin      = false;
 let selectedRows = new Set();
 let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
+let sidebarCollapsed = false;
 
 const TOKEN_KEY  = 'stkAuthToken';
 const ROLE_KEY   = 'stkAuthRole';
 const REMEMBER_KEY = 'stkRemember';
+const SIDEBAR_KEY  = 'stkSidebarCollapsed';
 
 // ── Modal instances ─────────────────────────────────────────
 let editModal, credModal, moveModal, confirmModal;
 let confirmResolver = null;
+
+// ── Modal stack (ESC hanya menutup dialog paling atas) ──────
+const modalStack = [];
+function registerModal(el, instance) {
+  el.addEventListener('shown.bs.modal', () => {
+    modalStack.push({ el, instance });
+  });
+  el.addEventListener('hidden.bs.modal', () => {
+    const idx = modalStack.findIndex(m => m.el === el);
+    if (idx !== -1) modalStack.splice(idx, 1);
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (!modalStack.length) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const top = modalStack[modalStack.length - 1];
+  top.instance.hide();
+});
 
 // ── API helper ──────────────────────────────────────────────
 async function api(action, body = {}) {
@@ -595,6 +642,11 @@ window.addEventListener('DOMContentLoaded', () => {
   moveModal   = new bootstrap.Modal(document.getElementById('moveModal'));
   confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
+  registerModal(document.getElementById('editModal'), editModal);
+  registerModal(document.getElementById('credModal'), credModal);
+  registerModal(document.getElementById('moveModal'), moveModal);
+  registerModal(document.getElementById('confirmModal'), confirmModal);
+
   document.getElementById('btnConfirmOk').addEventListener('click', () => {
     if (confirmResolver) confirmResolver(true);
     confirmResolver = null;
@@ -614,6 +666,19 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!GAS_URL || GAS_URL.startsWith('GANTI')) {
     document.getElementById('gasBanner').classList.add('show');
   }
+
+  // Tutup popover inline-edit & account menu saat klik di luar
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.inline-edit-pop') && !e.target.closest('.editable')) {
+      closeInlineEditPop();
+    }
+    if (!e.target.closest('#sidebarAccount')) {
+      document.getElementById('sidebarAccount')?.classList.remove('open');
+    }
+  });
+
+  sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1';
+  applySidebarCollapsed();
 
   attemptAutoLogin();
 });
@@ -720,6 +785,17 @@ function closeSidebarMobile() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarBackdrop').classList.remove('show');
 }
+function toggleSidebarCollapse() {
+  sidebarCollapsed = !sidebarCollapsed;
+  localStorage.setItem(SIDEBAR_KEY, sidebarCollapsed ? '1' : '0');
+  applySidebarCollapsed();
+}
+function applySidebarCollapsed() {
+  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+  const btn = document.getElementById('sidebarCollapseBtn');
+  if (btn) btn.title = sidebarCollapsed ? 'Lebarkan sidebar' : 'Ciutkan sidebar';
+  document.getElementById('sidebarAccount')?.classList.remove('open');
+}
 function updateSidebarActive({ page, sheet }) {
   document.querySelectorAll('.sidebar-nav .nav-item-link').forEach(el => {
     const match = (page && el.dataset.page === page) || (sheet && el.dataset.sheet === sheet);
@@ -757,14 +833,23 @@ function selectSheet(name) {
 function renderSidebarAccount() {
   const el  = document.getElementById('sidebarAccount');
   const lbl = isAdmin
-    ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Mode Admin</span>'
-    : '<span class="role-badge user"><i class="bi bi-eye"></i> Mode User</span>';
+    ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Admin</span>'
+    : '<span class="role-badge user"><i class="bi bi-eye"></i> User</span>';
   el.innerHTML = `
-    <div class="px-2 pb-2">${lbl}</div>
-    <div class="nav-item-link" onclick="openChangeCredModal()"><i class="bi bi-key"></i> Ubah Username/Password</div>
-    <div class="nav-item-link" onclick="switchUser()"><i class="bi bi-arrow-left-right"></i> Ganti User</div>
-    <div class="nav-item-link text-danger" onclick="logoutApp()"><i class="bi bi-box-arrow-right"></i> Keluar</div>
+    <div class="account-menu">
+      <div class="nav-item-link" onclick="openChangeCredModal()"><i class="bi bi-key"></i> <span class="link-label">Ubah Username/Password</span></div>
+      <div class="nav-item-link" onclick="switchUser()"><i class="bi bi-arrow-left-right"></i> <span class="link-label">Ganti User</span></div>
+      <div class="nav-item-link text-danger" onclick="logoutApp()"><i class="bi bi-box-arrow-right"></i> <span class="link-label">Keluar</span></div>
+    </div>
+    <div class="account-trigger" onclick="toggleAccountMenu()">
+      <div class="account-avatar"><i class="bi bi-person-fill"></i></div>
+      <div class="account-label-block">${lbl}</div>
+      <i class="bi bi-chevron-up"></i>
+    </div>
   `;
+}
+function toggleAccountMenu() {
+  document.getElementById('sidebarAccount').classList.toggle('open');
 }
 
 function applyColumnLayout() {
@@ -789,6 +874,7 @@ function openChangeCredModal() {
   document.getElementById('credErr').style.display = 'none';
   document.getElementById('credOk').style.display  = 'none';
   document.getElementById('cred_role').value = currentRole || 'admin';
+  document.getElementById('sidebarAccount')?.classList.remove('open');
   credModal.show();
 }
 
@@ -860,6 +946,9 @@ function showConfirm(message, opts) {
   const btnOk = document.getElementById('btnConfirmOk');
   btnOk.textContent = opts.okText || 'Ya, Lanjutkan';
   btnOk.className = 'btn ' + (opts.danger ? 'btn-danger' : 'btn-primary');
+  const contentEl = document.querySelector('#confirmModal .modal-content');
+  contentEl.classList.remove('is-danger','is-primary');
+  contentEl.classList.add(opts.danger ? 'is-danger' : 'is-primary');
   return new Promise((resolve) => {
     confirmResolver = resolve;
     confirmModal.show();
@@ -907,9 +996,103 @@ function renderPicAvatars(picStr) {
     let hash = 0;
     for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
     const color = AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-    return `<span class="pic-avatar" style="background:${color}" title="${n}">${initials}</span>`;
+    return `<span class="pic-avatar" style="background:${color}" title="${n}" data-bs-toggle="tooltip">${initials}</span>`;
   }).join('');
-  return `<span class="pic-avatar-group">${avatars}</span>`;
+  return `<div class="pic-avatars"><span class="pic-avatar-group">${avatars}</span></div>`;
+}
+
+// ── Inline edit: Status & Checklist ──────────────────────────
+function closeInlineEditPop() {
+  document.querySelectorAll('.inline-edit-pop').forEach(el => el.remove());
+}
+function positionPop(pop, anchor) {
+  const r = anchor.getBoundingClientRect();
+  document.body.appendChild(pop);
+  pop.style.position = 'absolute';
+  pop.style.top  = (window.scrollY + r.bottom + 6) + 'px';
+  let left = window.scrollX + r.left;
+  const maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 10;
+  if (left > maxLeft) left = maxLeft;
+  pop.style.left = Math.max(10, left) + 'px';
+}
+
+function openStatusEditor(ev, no) {
+  ev.stopPropagation();
+  if (!isAdmin) return;
+  closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
+  if (!row) return;
+  const cur = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
+  const pop = document.createElement('div');
+  pop.className = 'inline-edit-pop';
+  pop.innerHTML = `
+    <button type="button" class="${cur==='Ongoing'?'active':''}" onclick="applyInlineStatus('${no}','Ongoing')"><i class="bi bi-arrow-repeat text-warning"></i> Ongoing</button>
+    <button type="button" class="${cur==='Done'?'active':''}" onclick="applyInlineStatus('${no}','Done')"><i class="bi bi-check-circle text-success"></i> Done</button>
+  `;
+  positionPop(pop, ev.currentTarget);
+}
+
+function openChecklistEditor(ev, no, field) {
+  ev.stopPropagation();
+  if (!isAdmin) return;
+  closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
+  if (!row) return;
+  const idx = field === 'collected' ? 6 : 7;
+  const cur = row[idx] === true || row[idx] === 'TRUE';
+  const label = field === 'collected' ? 'Collected' : 'Uploaded to NAS';
+  const pop = document.createElement('div');
+  pop.className = 'inline-edit-pop';
+  pop.innerHTML = `
+    <button type="button" class="${cur?'':'active'}" onclick="applyInlineChecklist('${no}','${field}',false)"><i class="bi bi-x-circle text-muted"></i> Belum ${label}</button>
+    <button type="button" class="${cur?'active':''}" onclick="applyInlineChecklist('${no}','${field}',true)"><i class="bi bi-check-circle text-success"></i> ${label}</button>
+  `;
+  positionPop(pop, ev.currentTarget);
+}
+
+async function applyInlineStatus(no, statusValue) {
+  closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
+  if (!row) return;
+  const curStatus = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
+  if (curStatus === statusValue) return;
+  showGlobalLoading('Menyimpan status...');
+  try {
+    const d = await api('saveData', {
+      sheetName: activeSheet, token: authToken,
+      no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
+      statusPekerjaan: statusValue,
+      collected: row[6]===true||row[6]==='TRUE',
+      uploaded:  row[7]===true||row[7]==='TRUE',
+      keterangan: row[8]||''
+    });
+    cache[activeSheet] = d; renderTable(d); renderDashboard();
+    showToast('Status berhasil diperbarui.', 'success');
+  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
+  hideGlobalLoading();
+}
+
+async function applyInlineChecklist(no, field, value) {
+  closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
+  if (!row) return;
+  const idx = field === 'collected' ? 6 : 7;
+  const curVal = row[idx] === true || row[idx] === 'TRUE';
+  if (curVal === value) return;
+  showGlobalLoading('Menyimpan checklist...');
+  try {
+    const d = await api('saveData', {
+      sheetName: activeSheet, token: authToken,
+      no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
+      statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing',
+      collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'),
+      uploaded:  field==='uploaded'  ? value : (row[7]===true||row[7]==='TRUE'),
+      keterangan: row[8]||''
+    });
+    cache[activeSheet] = d; renderTable(d); renderDashboard();
+    showToast('Checklist berhasil diperbarui.', 'success');
+  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
+  hideGlobalLoading();
 }
 
 // ── Render tabel ──────────────────────────────────────────────
@@ -923,16 +1106,20 @@ function renderTable(data) {
   tbody.innerHTML = '';
   data.forEach(row => {
     const isDone = row[5] === 'Done' || row[5] === 'done';
+    const noStr  = String(row[0]);
+    const editableCls = isAdmin ? 'editable' : '';
+    const statusHandler = isAdmin ? `onclick="openStatusEditor(event,'${noStr}')"` : '';
     const pill   = isDone
-      ? '<span class="status-pill done"><i class="bi bi-check-circle"></i>Done</span>'
-      : '<span class="status-pill ongoing"><i class="bi bi-arrow-repeat"></i>Ongoing</span>';
+      ? `<span class="status-pill done ${editableCls}" ${statusHandler}><i class="bi bi-check-circle"></i>Done</span>`
+      : `<span class="status-pill ongoing ${editableCls}" ${statusHandler}><i class="bi bi-arrow-repeat"></i>Ongoing</span>`;
     const isColl = row[6] === true || row[6] === 'TRUE';
     const isUp   = row[7] === true || row[7] === 'TRUE';
-    const ic     = isColl ? '<i class="bi bi-file-earmark-check-fill text-success" title="Collected"></i>'
-                          : '<i class="bi bi-file-earmark text-muted" title="Belum collected"></i>';
-    const iu     = isUp   ? '<i class="bi bi-cloud-check-fill text-primary" title="Uploaded to NAS"></i>'
-                          : '<i class="bi bi-cloud-slash text-muted" title="Belum diupload"></i>';
-    const noStr  = String(row[0]);
+    const collHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','collected')"` : '';
+    const upHandler   = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','uploaded')"` : '';
+    const ic     = isColl ? `<i class="bi bi-file-earmark-check-fill text-success ${editableCls}" ${collHandler} title="Collected"></i>`
+                          : `<i class="bi bi-file-earmark text-muted ${editableCls}" ${collHandler} title="Belum collected"></i>`;
+    const iu     = isUp   ? `<i class="bi bi-cloud-check-fill text-primary ${editableCls}" ${upHandler} title="Uploaded to NAS"></i>`
+                          : `<i class="bi bi-cloud-slash text-muted ${editableCls}" ${upHandler} title="Belum diupload"></i>`;
     const selCell = isAdmin ? `<td class="text-center"><input type="checkbox" class="row-select-checkbox" data-no="${noStr}" ${selectedRows.has(noStr)?'checked':''} onchange="toggleRowSelect('${noStr}',this.checked)"></td>` : '';
     const aksiCell = isAdmin ? `<td class="text-center"><div class="d-flex gap-1 justify-content-center"><button type="button" class="btn-edit-row" onclick='editData(${JSON.stringify(row)})' title="Edit"><i class="bi bi-pencil-square"></i></button><button type="button" class="btn-edit-row" onclick="openMoveModal('${noStr}')" title="Ubah urutan"><i class="bi bi-arrows-move"></i></button></div></td>` : '';
     const tr = document.createElement('tr');
