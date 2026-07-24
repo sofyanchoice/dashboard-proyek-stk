@@ -122,13 +122,10 @@
     .sortable:hover .sort-icon{opacity:.75;}
     .sort-icon.active{opacity:1;color:var(--brand);}
 
-    .table-meta{display:none;align-items:center;justify-content:flex-end;padding:10px 20px;border-bottom:1px solid var(--line);background:#fafbfc;flex-wrap:wrap;gap:10px;}
-    .table-meta.active{display:flex;}
-    .filtered-count{color:var(--ink-soft);font-size:.82rem;font-weight:600;white-space:nowrap;background:var(--canvas);padding:6px 12px;border-radius:8px;}
-    .batch-toolbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;width:100%;}
-    .batch-toolbar.active{display:flex;}
-    .batch-toolbar .batch-count{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:6px 12px;border-radius:8px;font-size:.85rem;white-space:nowrap;}
-    .batch-toolbar select{border-radius:8px;border-color:var(--line);font-size:.85rem;padding:6px 10px;}
+    .filtered-count{color:var(--ink-soft);font-size:.82rem;font-weight:600;white-space:nowrap;background:var(--canvas);padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:8px;}
+    .filtered-count.selection-mode{background:var(--brand-soft);color:var(--brand);}
+    .filtered-count .clear-selection-btn{border:none;background:transparent;color:inherit;padding:0;display:flex;align-items:center;line-height:1;opacity:.75;}
+    .filtered-count .clear-selection-btn:hover{opacity:1;}
 
     .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-weight:700;font-size:.78rem;white-space:nowrap;border:none;cursor:pointer;}
     .status-pill.done{background:var(--done-soft);color:var(--done);}
@@ -142,7 +139,7 @@
     .btn-edit-row:hover{background:var(--brand-soft);}
 
     /* ── PIC Avatars ── */
-    .pic-avatars{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .pic-avatars{display:flex;flex-direction:column;align-items:flex-start;gap:4px;}
     .pic-avatar-group{display:flex;align-items:center;}
     .pic-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;border:2px solid var(--surface);cursor:default;}
     .pic-avatar-group .pic-avatar:not(:first-child){margin-left:-8px;}
@@ -240,6 +237,7 @@
     .inline-edit-pop button{display:flex;align-items:center;gap:8px;border:none;background:transparent;text-align:left;padding:8px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;}
     .inline-edit-pop button:hover{background:var(--canvas);}
     .inline-edit-pop button.active{background:var(--brand-soft);color:var(--brand);}
+    .inline-edit-pop .pop-hint{padding:6px 10px 2px;font-size:.72rem;color:var(--ink-soft);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
   </style>
 </head>
 <body>
@@ -396,17 +394,7 @@
           </div>
         </div>
         <div class="card-body p-0">
-          <div class="table-meta" id="tableMeta">
-            <div class="batch-toolbar" id="batchToolbar">
-              <span class="batch-count" id="batchCount">0 data dipilih</span>
-              <select id="batchStatus"><option value="">Status: tidak diubah</option><option value="Ongoing">Set Ongoing</option><option value="Done">Set Done</option></select>
-              <select id="batchCollected"><option value="">Collected: tidak diubah</option><option value="true">Tandai Collected</option><option value="false">Batalkan Collected</option></select>
-              <select id="batchUploaded"><option value="">Uploaded: tidak diubah</option><option value="true">Tandai Uploaded</option><option value="false">Batalkan Uploaded</option></select>
-              <button type="button" class="btn btn-primary btn-sm" id="btnBatchApply" onclick="batchApply()"><i class="bi bi-check2-all me-1"></i> Terapkan</button>
-              <button type="button" class="btn btn-light border btn-sm" onclick="clearSelection()">Batal</button>
-            </div>
-          </div>
-          <div class="table-shell">
+          <div class="table-shell" id="tableShell">
             <table class="table table-hover mb-0" id="dataTable">
               <colgroup><col id="colSelect"><col id="colNo"><col id="colJudul"><col id="colTahun"><col id="colJenis"><col id="colPic"><col id="colStatus"><col id="colChecklist"><col id="colKet"><col id="colAksi"></colgroup>
               <thead>
@@ -593,14 +581,17 @@ let currentPage  = 'dashboard';
 const cache      = { Pekerjaan: null, USTEK: null };
 let authToken    = null;
 let currentRole  = null;
+let loggedUsername = null;
 let isAdmin      = false;
 let selectedRows = new Set();
 let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
 let sidebarCollapsed = false;
+const scrollPositions = { Pekerjaan: 0, USTEK: 0 };
 
 const TOKEN_KEY  = 'stkAuthToken';
 const ROLE_KEY   = 'stkAuthRole';
+const USER_KEY   = 'stkAuthUsername';
 const REMEMBER_KEY = 'stkRemember';
 const SIDEBAR_KEY  = 'stkSidebarCollapsed';
 
@@ -688,6 +679,11 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Simpan posisi scroll tabel per sheet supaya tidak "ikut" saat pindah tab
+  document.getElementById('tableShell').addEventListener('scroll', function() {
+    scrollPositions[activeSheet] = this.scrollTop;
+  });
+
   sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1';
   applySidebarCollapsed();
 
@@ -705,6 +701,7 @@ async function attemptAutoLogin() {
     const r = await api('validateToken', { token });
     if (r && r.valid) {
       authToken = token; currentRole = r.role; isAdmin = r.role === 'admin';
+      loggedUsername = storage.getItem(USER_KEY) || r.username || currentRole;
       hideLoginGate(); onAuthenticated();
     } else { clearStoredAuth(); showLoginForm(); }
   } catch (_) { showLoginForm(); }
@@ -739,9 +736,11 @@ async function submitLogin(e) {
     const r = await api('login', { username, password, rememberMe: remember });
     if (r && r.success) {
       authToken = r.token; currentRole = r.role; isAdmin = r.role === 'admin';
+      loggedUsername = username;
       const storage = remember ? localStorage : sessionStorage;
       storage.setItem(TOKEN_KEY, r.token);
       storage.setItem(ROLE_KEY, r.role);
+      storage.setItem(USER_KEY, username);
       if (remember) localStorage.setItem(REMEMBER_KEY, '1');
       document.getElementById('loginForm').reset();
       hideLoginGate(); onAuthenticated();
@@ -759,14 +758,14 @@ async function submitLogin(e) {
 
 function clearStoredAuth() {
   [localStorage, sessionStorage].forEach(s => {
-    s.removeItem(TOKEN_KEY); s.removeItem(ROLE_KEY);
+    s.removeItem(TOKEN_KEY); s.removeItem(ROLE_KEY); s.removeItem(USER_KEY);
   });
   localStorage.removeItem(REMEMBER_KEY);
 }
 
 async function logoutApp() {
   if (authToken) { try { await api('logout', { token: authToken }); } catch(_){} }
-  authToken = null; currentRole = null; isAdmin = false;
+  authToken = null; currentRole = null; isAdmin = false; loggedUsername = null;
   clearStoredAuth(); cache.Pekerjaan = cache.USTEK = null;
   clearSelection(); closeAddPanel(); showLoginGate();
 }
@@ -841,11 +840,20 @@ function selectSheet(name) {
 }
 
 // ── Role / akun di sidebar ─────────────────────────────────
+function hashColor(str) {
+  let hash = 0;
+  const s = String(str || '');
+  for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
 function renderSidebarAccount() {
   const el  = document.getElementById('sidebarAccount');
   const lbl = isAdmin
     ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Admin</span>'
     : '<span class="role-badge user"><i class="bi bi-eye"></i> User</span>';
+  // Warna avatar dibedakan per akun/user supaya mudah dibedakan pada multiuser
+  const accentColor = hashColor(loggedUsername || currentRole || 'user');
   el.innerHTML = `
     <div class="account-menu">
       <div class="nav-item-link" onclick="openChangeCredModal()"><i class="bi bi-key"></i> <span class="link-label">Ubah Username/Password</span></div>
@@ -853,7 +861,7 @@ function renderSidebarAccount() {
       <div class="nav-item-link text-danger" onclick="logoutApp()"><i class="bi bi-box-arrow-right"></i> <span class="link-label">Keluar</span></div>
     </div>
     <div class="account-trigger" onclick="toggleAccountMenu()">
-      <div class="account-avatar"><i class="bi bi-person-fill"></i></div>
+      <div class="account-avatar" style="background:${accentColor}22;color:${accentColor}"><i class="bi bi-person-fill"></i></div>
       <div class="account-label-block">${lbl}</div>
       <i class="bi bi-chevron-up"></i>
     </div>
@@ -978,12 +986,17 @@ function showError(msg) {
 
 // ── Sheet / tabel ────────────────────────────────────────────
 async function changeSheet(name) {
+  // simpan posisi scroll sheet lama sebelum pindah, supaya scroll tiap tab independen
+  const shell = document.getElementById('tableShell');
+  scrollPositions[activeSheet] = shell.scrollTop;
+
   activeSheet = name;
   document.getElementById('searchInput').value = '';
   document.getElementById('btnClearSearch').style.display = 'none';
   clearSelection(); sortState = { column: null, direction: 'asc' }; updateSortIcons();
 
   if (cache[name]) { renderTable(cache[name]); } else { showLoading(); }
+  restoreScrollPosition();
 
   try {
     const d = await api('getData', { sheet: name, token: authToken });
@@ -992,6 +1005,10 @@ async function changeSheet(name) {
     renderDashboard();
   } catch (err) { showError(err.message); }
 }
+function restoreScrollPosition() {
+  const shell = document.getElementById('tableShell');
+  requestAnimationFrame(() => { shell.scrollTop = scrollPositions[activeSheet] || 0; });
+}
 
 // ── Avatar inisial PIC ───────────────────────────────────────
 const AVATAR_COLORS = ['#2563eb','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2','#db2777','#4f46e5'];
@@ -999,17 +1016,21 @@ function renderPicAvatars(picStr) {
   if (!picStr) return '<span class="text-muted">-</span>';
   const names = String(picStr).split(',').map(s => s.trim()).filter(Boolean);
   if (!names.length) return '<span class="text-muted">-</span>';
-  const avatars = names.map(n => {
-    const parts = n.split(/\s+/).filter(Boolean);
-    const initials = parts.length >= 2
-      ? (parts[0][0] + parts[1][0]).toUpperCase()
-      : n.substring(0,2).toUpperCase();
-    let hash = 0;
-    for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
-    const color = AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-    return `<span class="pic-avatar" style="background:${color}" title="${n}" data-bs-toggle="tooltip">${initials}</span>`;
+  // Maksimal 3 avatar per baris, sisanya di-wrap ke baris berikutnya
+  const rows = [];
+  for (let i = 0; i < names.length; i += 3) rows.push(names.slice(i, i + 3));
+  const rowsHtml = rows.map(group => {
+    const avatars = group.map(n => {
+      const parts = n.split(/\s+/).filter(Boolean);
+      const initials = parts.length >= 2
+        ? (parts[0][0] + parts[1][0]).toUpperCase()
+        : n.substring(0,2).toUpperCase();
+      const color = hashColor(n);
+      return `<span class="pic-avatar" style="background:${color}" title="${n}" data-bs-toggle="tooltip">${initials}</span>`;
+    }).join('');
+    return `<span class="pic-avatar-group">${avatars}</span>`;
   }).join('');
-  return `<div class="pic-avatars"><span class="pic-avatar-group">${avatars}</span></div>`;
+  return `<div class="pic-avatars">${rowsHtml}</div>`;
 }
 
 // ── Inline edit: Status & Checklist ──────────────────────────
@@ -1027,6 +1048,14 @@ function positionPop(pop, anchor) {
   pop.style.left = Math.max(10, left) + 'px';
 }
 
+// Baris-baris yang ikut diedit bersamaan: jika baris yang diklik termasuk dalam
+// seleksi (dan ada lebih dari 1 data terpilih), maka semua data terpilih ikut berubah.
+function targetRowsFor(no) {
+  const noStr = String(no);
+  if (selectedRows.size > 1 && selectedRows.has(noStr)) return [...selectedRows];
+  return [noStr];
+}
+
 function openStatusEditor(ev, no) {
   ev.stopPropagation();
   if (!isAdmin) return;
@@ -1034,9 +1063,12 @@ function openStatusEditor(ev, no) {
   const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
   if (!row) return;
   const cur = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
+  const targets = targetRowsFor(no);
+  const hint = targets.length > 1 ? `<div class="pop-hint">${targets.length} data terpilih</div>` : '';
   const pop = document.createElement('div');
   pop.className = 'inline-edit-pop';
   pop.innerHTML = `
+    ${hint}
     <button type="button" class="${cur==='Ongoing'?'active':''}" onclick="applyInlineStatus('${no}','Ongoing')"><i class="bi bi-arrow-repeat text-warning"></i> Ongoing</button>
     <button type="button" class="${cur==='Done'?'active':''}" onclick="applyInlineStatus('${no}','Done')"><i class="bi bi-check-circle text-success"></i> Done</button>
   `;
@@ -1052,9 +1084,12 @@ function openChecklistEditor(ev, no, field) {
   const idx = field === 'collected' ? 6 : 7;
   const cur = row[idx] === true || row[idx] === 'TRUE';
   const label = field === 'collected' ? 'Collected' : 'Uploaded to NAS';
+  const targets = targetRowsFor(no);
+  const hint = targets.length > 1 ? `<div class="pop-hint">${targets.length} data terpilih</div>` : '';
   const pop = document.createElement('div');
   pop.className = 'inline-edit-pop';
   pop.innerHTML = `
+    ${hint}
     <button type="button" class="${cur?'':'active'}" onclick="applyInlineChecklist('${no}','${field}',false)"><i class="bi bi-x-circle text-muted"></i> Belum ${label}</button>
     <button type="button" class="${cur?'active':''}" onclick="applyInlineChecklist('${no}','${field}',true)"><i class="bi bi-check-circle text-success"></i> ${label}</button>
   `;
@@ -1063,20 +1098,25 @@ function openChecklistEditor(ev, no, field) {
 
 async function applyInlineStatus(no, statusValue) {
   closeInlineEditPop();
-  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
-  if (!row) return;
-  const curStatus = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
-  if (curStatus === statusValue) return;
-  showGlobalLoading('Menyimpan status...');
+  const targets = targetRowsFor(no);
+  const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
+  if (!rows.length) return;
+  showGlobalLoading(rows.length > 1 ? `Menyimpan status untuk ${rows.length} data...` : 'Menyimpan status...');
   try {
-    const d = await api('saveData', {
-      sheetName: activeSheet, token: authToken,
-      no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
-      statusPekerjaan: statusValue,
-      collected: row[6]===true||row[6]==='TRUE',
-      uploaded:  row[7]===true||row[7]==='TRUE',
-      keterangan: row[8]||''
-    });
+    let d;
+    if (rows.length > 1) {
+      d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue, collectedValue: null, uploadedValue: null });
+    } else {
+      const row = rows[0];
+      d = await api('saveData', {
+        sheetName: activeSheet, token: authToken,
+        no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
+        statusPekerjaan: statusValue,
+        collected: row[6]===true||row[6]==='TRUE',
+        uploaded:  row[7]===true||row[7]==='TRUE',
+        keterangan: row[8]||''
+      });
+    }
     cache[activeSheet] = d; renderTable(d); renderDashboard();
     showToast('Status berhasil diperbarui.', 'success');
   } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
@@ -1085,21 +1125,30 @@ async function applyInlineStatus(no, statusValue) {
 
 async function applyInlineChecklist(no, field, value) {
   closeInlineEditPop();
-  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
-  if (!row) return;
-  const idx = field === 'collected' ? 6 : 7;
-  const curVal = row[idx] === true || row[idx] === 'TRUE';
-  if (curVal === value) return;
-  showGlobalLoading('Menyimpan checklist...');
+  const targets = targetRowsFor(no);
+  const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
+  if (!rows.length) return;
+  showGlobalLoading(rows.length > 1 ? `Menyimpan checklist untuk ${rows.length} data...` : 'Menyimpan checklist...');
   try {
-    const d = await api('saveData', {
-      sheetName: activeSheet, token: authToken,
-      no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
-      statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing',
-      collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'),
-      uploaded:  field==='uploaded'  ? value : (row[7]===true||row[7]==='TRUE'),
-      keterangan: row[8]||''
-    });
+    let d;
+    if (rows.length > 1) {
+      d = await api('batchUpdate', {
+        sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken,
+        statusValue: null,
+        collectedValue: field === 'collected' ? value : null,
+        uploadedValue:  field === 'uploaded'  ? value : null
+      });
+    } else {
+      const row = rows[0];
+      d = await api('saveData', {
+        sheetName: activeSheet, token: authToken,
+        no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
+        statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing',
+        collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'),
+        uploaded:  field==='uploaded'  ? value : (row[7]===true||row[7]==='TRUE'),
+        keterangan: row[8]||''
+      });
+    }
     cache[activeSheet] = d; renderTable(d); renderDashboard();
     showToast('Checklist berhasil diperbarui.', 'success');
   } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
@@ -1284,27 +1333,27 @@ function editData(row) {
 
 async function submitEditData(e) {
   e.preventDefault(); if (!isAdmin) return;
-  const btn = document.getElementById('btnEditSubmit');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+  const payload = {
+    sheetName: activeSheet, token: authToken,
+    no:   document.getElementById('edit_no').value,
+    judul:document.getElementById('edit_judul').value,
+    tahun:document.getElementById('edit_tahun').value,
+    jenis:document.getElementById('edit_jenis').value,
+    pic:  document.getElementById('edit_pic').value,
+    statusPekerjaan: document.getElementById('edit_status').value,
+    collected: document.getElementById('edit_collected').checked,
+    uploaded:  document.getElementById('edit_uploaded').checked,
+    keterangan: document.getElementById('edit_keterangan').value
+  };
+  // Tutup dialog dulu bersamaan dengan memulai animasi loading proses
+  editModal.hide();
   showGlobalLoading('Menyimpan perubahan...');
   try {
-    const d = await api('saveData', {
-      sheetName: activeSheet, token: authToken,
-      no:   document.getElementById('edit_no').value,
-      judul:document.getElementById('edit_judul').value,
-      tahun:document.getElementById('edit_tahun').value,
-      jenis:document.getElementById('edit_jenis').value,
-      pic:  document.getElementById('edit_pic').value,
-      statusPekerjaan: document.getElementById('edit_status').value,
-      collected: document.getElementById('edit_collected').checked,
-      uploaded:  document.getElementById('edit_uploaded').checked,
-      keterangan: document.getElementById('edit_keterangan').value
-    });
-    cache[activeSheet] = d; renderTable(d); renderDashboard(); editModal.hide();
+    const d = await api('saveData', payload);
+    cache[activeSheet] = d; renderTable(d); renderDashboard();
     showToast('Perubahan berhasil disimpan.', 'success');
   } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
   hideGlobalLoading();
-  btn.disabled = false; btn.innerHTML = '<i class="bi bi-save me-1"></i> Update Data';
 }
 
 async function deleteFromModal() {
@@ -1314,22 +1363,16 @@ async function deleteFromModal() {
   if (!ok) return;
 
   isDeletingRow = true;
-  ['btnDeleteRow','btnEditSubmit','btnEditCancel','btnEditCloseX'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.disabled = true;
-  });
-  document.getElementById('btnDeleteRow').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menghapus...';
+  // Tutup dulu dialog edit bersamaan dengan animasi menghapus data
+  editModal.hide();
   showGlobalLoading('Menghapus data...');
   try {
     const d = await api('deleteData', { sheetName: activeSheet, no, token: authToken });
-    cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard(); editModal.hide();
+    cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard();
     showToast('Data berhasil dihapus.', 'success');
   } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
   hideGlobalLoading();
   isDeletingRow = false;
-  ['btnDeleteRow','btnEditSubmit','btnEditCancel','btnEditCloseX'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.disabled = false;
-  });
-  document.getElementById('btnDeleteRow').innerHTML = '<i class="bi bi-trash3 me-1"></i> Hapus Data';
 }
 
 // ── Move modal ───────────────────────────────────────────────
@@ -1356,16 +1399,15 @@ async function submitMoveRow(e) {
     errEl.textContent = 'Nomor tujuan wajib diisi dan harus berbeda.';
     errEl.style.display = 'block'; return;
   }
-  const btn = document.getElementById('btnMoveSubmit');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memindahkan...';
+  // Tutup dulu dialog bersamaan dengan animasi memindahkan data
+  moveModal.hide();
   showGlobalLoading('Memindahkan urutan data...');
   try {
     const d = await api('reorder', { sheetName: activeSheet, fromNo, toNo, token: authToken });
-    cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard(); moveModal.hide();
+    cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard();
     showToast('Urutan data berhasil diubah.', 'success');
-  } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
   hideGlobalLoading();
-  btn.disabled = false; btn.innerHTML = '<i class="bi bi-arrows-move me-1"></i> Pindahkan';
 }
 
 // ── Search ───────────────────────────────────────────────────
@@ -1379,11 +1421,8 @@ function filterTable() {
     r.style.display = show ? '' : 'none';
     if (show) vis++;
   }
-  const cEl = document.getElementById('filteredCount');
-  if (!q) { cEl.style.display = 'none'; } else {
-    cEl.style.display = ''; cEl.textContent = `Menampilkan ${vis} dari ${rows.length} data`;
-  }
   if (isAdmin) updateSelectAllCheckbox();
+  updateFilteredCountDisplay(vis, rows.length, q);
 }
 function clearSearch() {
   const inp = document.getElementById('searchInput');
@@ -1392,10 +1431,28 @@ function clearSearch() {
   inp.focus();
 }
 
-// ── Batch edit ───────────────────────────────────────────────
+// ── Jumlah data terfilter / terpilih (satu lokasi, tidak mengubah struktur header) ──
+function updateFilteredCountDisplay(vis, totalRows, q) {
+  const cEl = document.getElementById('filteredCount');
+  const n = selectedRows.size;
+  if (n > 0) {
+    cEl.style.display = '';
+    cEl.classList.add('selection-mode');
+    cEl.innerHTML = `${n} data dipilih <button type="button" class="clear-selection-btn" onclick="clearSelection()" title="Batalkan pilihan"><i class="bi bi-x-lg"></i></button>`;
+  } else if (q) {
+    cEl.style.display = '';
+    cEl.classList.remove('selection-mode');
+    cEl.textContent = `Menampilkan ${vis} dari ${totalRows} data`;
+  } else {
+    cEl.style.display = 'none';
+    cEl.classList.remove('selection-mode');
+  }
+}
+
+// ── Seleksi baris (batch inline edit, tanpa toolbar terpisah) ──────────────
 function toggleRowSelect(no, checked) {
   if (checked) selectedRows.add(String(no)); else selectedRows.delete(String(no));
-  updateSelectAllCheckbox(); updateBatchToolbar();
+  updateSelectAllCheckbox(); refreshSelectionDisplay();
 }
 function toggleSelectAll(cb) {
   const checked = cb.checked;
@@ -1405,7 +1462,7 @@ function toggleSelectAll(cb) {
     c.checked = checked;
     if (checked) selectedRows.add(c.dataset.no); else selectedRows.delete(c.dataset.no);
   });
-  updateBatchToolbar();
+  refreshSelectionDisplay();
 }
 function updateSelectAllCheckbox() {
   const all  = document.getElementById('selectAllCheckbox');
@@ -1414,47 +1471,18 @@ function updateSelectAllCheckbox() {
   const n = rows.filter(r => r.querySelector('.row-select-checkbox').checked).length;
   all.checked = n === rows.length; all.indeterminate = n > 0 && n < rows.length;
 }
-function updateBatchToolbar() {
-  const n    = selectedRows.size;
-  const tb   = document.getElementById('batchToolbar');
-  const meta = document.getElementById('tableMeta');
-  if (n > 0) {
-    tb.classList.add('active'); meta.classList.add('active');
-    document.getElementById('batchCount').textContent = n + ' data dipilih';
-  } else { tb.classList.remove('active'); meta.classList.remove('active'); }
+function refreshSelectionDisplay() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+  const vis = [...rows].filter(r => r.style.display !== 'none').length;
+  updateFilteredCountDisplay(vis, rows.length, q);
 }
 function clearSelection() {
   selectedRows.clear();
   document.querySelectorAll('.row-select-checkbox').forEach(c => c.checked = false);
   const all = document.getElementById('selectAllCheckbox');
   if (all) { all.checked = false; all.indeterminate = false; }
-  ['batchStatus','batchCollected','batchUploaded'].forEach(id => { const el = document.getElementById(id); if (el) el.value=''; });
-  updateBatchToolbar();
-}
-
-async function batchApply() {
-  if (!isAdmin || !selectedRows.size) return;
-  const sv = document.getElementById('batchStatus').value;
-  const cv = document.getElementById('batchCollected').value;
-  const uv = document.getElementById('batchUploaded').value;
-  if (!sv && !cv && !uv) { showToast('Pilih perubahan terlebih dahulu.', 'info'); return; }
-  const btn = document.getElementById('btnBatchApply');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menerapkan...';
-  showGlobalLoading('Menerapkan perubahan batch...');
-  try {
-    const d = await api('batchUpdate', {
-      sheetName: activeSheet, nos: [...selectedRows], token: authToken,
-      statusValue:    sv || null,
-      collectedValue: cv === '' ? null : (cv === 'true'),
-      uploadedValue:  uv === '' ? null : (uv === 'true')
-    });
-    cache[activeSheet] = d; selectedRows.clear(); renderTable(d); renderDashboard();
-    ['batchStatus','batchCollected','batchUploaded'].forEach(id => document.getElementById(id).value='');
-    updateBatchToolbar();
-    showToast('Perubahan batch berhasil diterapkan.', 'success');
-  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
-  hideGlobalLoading();
-  btn.disabled = false; btn.innerHTML = '<i class="bi bi-check2-all me-1"></i> Terapkan';
+  refreshSelectionDisplay();
 }
 
 // ── Refresh ──────────────────────────────────────────────────
