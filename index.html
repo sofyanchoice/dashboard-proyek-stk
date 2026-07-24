@@ -70,8 +70,6 @@
     .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
     .account-trigger:hover{background:var(--canvas);}
     .account-trigger .account-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-size:1.05rem;}
-    .account-trigger .account-avatar.role-admin{background:var(--done-soft);color:var(--done);}
-    .account-trigger .account-avatar.role-user{background:var(--user-soft);color:var(--user-c);}
     .account-trigger .account-label-block{flex:1;min-width:0;}
     .account-trigger .account-label-block .acc-name{font-weight:700;font-size:.85rem;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .account-trigger i.bi-chevron-up{transition:transform .2s;color:var(--ink-soft);flex-shrink:0;}
@@ -124,11 +122,13 @@
     .sortable:hover .sort-icon{opacity:.75;}
     .sort-icon.active{opacity:1;color:var(--brand);}
 
+    .table-meta{display:none;align-items:center;justify-content:flex-end;padding:10px 20px;border-bottom:1px solid var(--line);background:#fafbfc;flex-wrap:wrap;gap:10px;}
+    .table-meta.active{display:flex;}
     .filtered-count{color:var(--ink-soft);font-size:.82rem;font-weight:600;white-space:nowrap;background:var(--canvas);padding:6px 12px;border-radius:8px;}
-    .filtered-count.selection-badge{background:var(--brand-soft);color:var(--brand);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-    .filtered-count.selection-badge:hover{filter:brightness(0.96);}
-    .filtered-count.selection-badge i{font-size:.85rem;}
-    .inline-edit-pop-label{font-size:.72rem;font-weight:700;color:var(--ink-soft);padding:6px 10px 4px;text-transform:uppercase;letter-spacing:.03em;}
+    .batch-toolbar{display:none;align-items:center;gap:10px;flex-wrap:wrap;width:100%;}
+    .batch-toolbar.active{display:flex;}
+    .batch-toolbar .batch-count{background:var(--brand-soft);color:var(--brand);font-weight:700;padding:6px 12px;border-radius:8px;font-size:.85rem;white-space:nowrap;}
+    .batch-toolbar select{border-radius:8px;border-color:var(--line);font-size:.85rem;padding:6px 10px;}
 
     .status-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-weight:700;font-size:.78rem;white-space:nowrap;border:none;cursor:pointer;}
     .status-pill.done{background:var(--done-soft);color:var(--done);}
@@ -142,10 +142,10 @@
     .btn-edit-row:hover{background:var(--brand-soft);}
 
     /* ── PIC Avatars ── */
-    .pic-avatars{display:flex;flex-direction:column;gap:4px;}
-    .pic-avatar-row{display:flex;align-items:center;}
+    .pic-avatars{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .pic-avatar-group{display:flex;align-items:center;}
     .pic-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;border:2px solid var(--surface);cursor:default;}
-    .pic-avatar-row .pic-avatar:not(:first-child){margin-left:-8px;}
+    .pic-avatar-group .pic-avatar:not(:first-child){margin-left:-8px;}
 
     /* ── Modals ── */
     .modal-content{border-radius:14px;border:none;box-shadow:0 20px 60px rgba(15,23,42,.28);}
@@ -205,13 +205,6 @@
     .year-row .year-bar-track{flex:1;height:10px;border-radius:999px;background:var(--canvas);overflow:hidden;}
     .year-row .year-bar-fill{height:100%;background:var(--brand);border-radius:999px;transition:width .5s ease;}
     .year-row .year-count{width:34px;text-align:right;font-size:.82rem;color:var(--ink-soft);font-weight:700;flex-shrink:0;}
-
-    /* ── History ── */
-    .history-item{display:flex;align-items:flex-start;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);}
-    .history-item:last-child{border-bottom:none;}
-    .history-item .history-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--canvas);font-size:1rem;}
-    .history-item .history-text{font-weight:600;font-size:.88rem;color:var(--ink);}
-    .history-item .history-meta{font-size:.78rem;color:var(--ink-soft);margin-top:2px;}
 
     /* ── FAB ── */
     .fab-btn{position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;border:none;display:none;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 20px rgba(37,99,235,.35);z-index:1045;transition:transform .15s,background .15s;}
@@ -320,7 +313,6 @@
       <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
       <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
       <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
-      <div class="nav-item-link" data-page="history" onclick="goToPage('history')"><i class="bi bi-clock-history"></i> <span class="link-label">Riwayat</span></div>
     </div>
     <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
@@ -404,6 +396,16 @@
           </div>
         </div>
         <div class="card-body p-0">
+          <div class="table-meta" id="tableMeta">
+            <div class="batch-toolbar" id="batchToolbar">
+              <span class="batch-count" id="batchCount">0 data dipilih</span>
+              <select id="batchStatus"><option value="">Status: tidak diubah</option><option value="Ongoing">Set Ongoing</option><option value="Done">Set Done</option></select>
+              <select id="batchCollected"><option value="">Collected: tidak diubah</option><option value="true">Tandai Collected</option><option value="false">Batalkan Collected</option></select>
+              <select id="batchUploaded"><option value="">Uploaded: tidak diubah</option><option value="true">Tandai Uploaded</option><option value="false">Batalkan Uploaded</option></select>
+              <button type="button" class="btn btn-primary btn-sm" id="btnBatchApply" onclick="batchApply()"><i class="bi bi-check2-all me-1"></i> Terapkan</button>
+              <button type="button" class="btn btn-light border btn-sm" onclick="clearSelection()">Batal</button>
+            </div>
+          </div>
           <div class="table-shell">
             <table class="table table-hover mb-0" id="dataTable">
               <colgroup><col id="colSelect"><col id="colNo"><col id="colJudul"><col id="colTahun"><col id="colJenis"><col id="colPic"><col id="colStatus"><col id="colChecklist"><col id="colKet"><col id="colAksi"></colgroup>
@@ -424,20 +426,6 @@
               <tbody id="tableBody"></tbody>
             </table>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PAGE: HISTORY -->
-    <div id="page-history" style="display:none;">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2 text-primary"></i>Riwayat Aktivitas</h5>
-          <button type="button" class="btn btn-light border btn-sm" onclick="clearHistory()"><i class="bi bi-trash3 me-1"></i>Bersihkan</button>
-        </div>
-        <div class="card-body">
-          <p class="text-muted small mb-3"><i class="bi bi-info-circle me-1"></i>Riwayat ini tersimpan lokal di perangkat/browser ini saja, tidak disinkronkan ke perangkat lain.</p>
-          <div id="historyList"></div>
         </div>
       </div>
     </div>
@@ -858,7 +846,6 @@ function renderSidebarAccount() {
   const lbl = isAdmin
     ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Admin</span>'
     : '<span class="role-badge user"><i class="bi bi-eye"></i> User</span>';
-  const avatarClass = isAdmin ? 'role-admin' : 'role-user';
   el.innerHTML = `
     <div class="account-menu">
       <div class="nav-item-link" onclick="openChangeCredModal()"><i class="bi bi-key"></i> <span class="link-label">Ubah Username/Password</span></div>
@@ -866,7 +853,7 @@ function renderSidebarAccount() {
       <div class="nav-item-link text-danger" onclick="logoutApp()"><i class="bi bi-box-arrow-right"></i> <span class="link-label">Keluar</span></div>
     </div>
     <div class="account-trigger" onclick="toggleAccountMenu()">
-      <div class="account-avatar ${avatarClass}"><i class="bi bi-person-fill"></i></div>
+      <div class="account-avatar"><i class="bi bi-person-fill"></i></div>
       <div class="account-label-block">${lbl}</div>
       <i class="bi bi-chevron-up"></i>
     </div>
@@ -1021,12 +1008,8 @@ function renderPicAvatars(picStr) {
     for (let i = 0; i < n.length; i++) hash = n.charCodeAt(i) + ((hash << 5) - hash);
     const color = AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
     return `<span class="pic-avatar" style="background:${color}" title="${n}" data-bs-toggle="tooltip">${initials}</span>`;
-  });
-  const rows = [];
-  for (let i = 0; i < avatars.length; i += 3) {
-    rows.push(`<span class="pic-avatar-row">${avatars.slice(i, i + 3).join('')}</span>`);
-  }
-  return `<div class="pic-avatars">${rows.join('')}</div>`;
+  }).join('');
+  return `<div class="pic-avatars"><span class="pic-avatar-group">${avatars}</span></div>`;
 }
 
 // ── Inline edit: Status & Checklist ──────────────────────────
