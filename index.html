@@ -15,7 +15,6 @@
     body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--canvas);color:var(--ink);margin:0;}
     .subtitle{color:var(--ink-soft);font-size:.9rem;margin:0;}
 
-    /* ── App shell / Sidebar ── */
     .app-shell{display:flex;min-height:100vh;}
     .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:1035;}
     .sidebar-backdrop.show{display:block;}
@@ -92,12 +91,11 @@
     .search-box .btn{border:none;border-left:1px solid var(--line);border-radius:0;background:transparent;}
     .card-header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
-    /* ── FIXED TABLE LAYOUT & TEXT WRAPPED (DIUBAH AGAR BISA TURUN KE BAWAH) ── */
+    /* ── TABEL FIXED & TEXT WRAPPED (Membungkus teks agar tampil penuh) ── */
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
     #dataTable{table-layout:fixed;width:100%;min-width:1050px;margin-bottom:0;}
     #dataTable th, #dataTable td{vertical-align:middle;padding:12px 14px;font-size:.9rem;}
     
-    /* Mengubah kelas agar teks judul bisa wrapped sepenuhnya dan tidak terpotong */
     .td-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
     
     #dataTable thead th{position:sticky;top:0;z-index:2;background:#f8fafc;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
@@ -860,7 +858,6 @@ function checkSortableState() {
   }
 }
 
-// ── Render Tabel (Judul sekarang menggunakan .td-wrap agar tidak terpotong) ──
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   if (!data || data.length === 0) {
