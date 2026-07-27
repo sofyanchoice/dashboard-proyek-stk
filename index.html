@@ -316,7 +316,7 @@
       <div class="nav-section-label">Halaman</div>
       <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
       <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
-      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
+      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">Usulan Teknis</span></div>
     </div>
     <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
@@ -763,7 +763,7 @@ function selectSheet(name) {
   document.getElementById('topbarTitle').textContent = name;
   document.getElementById('topbarSubtitle').textContent = name === 'Pekerjaan'
     ? 'Daftar pekerjaan dan status penyelesaian'
-    : 'Dokumen dan checklist USTEK';
+    : 'Dokumen dan checklist Usulan Teknis';
   currentPage = 'table';
   document.getElementById('page-dashboard').style.display = 'none'; document.getElementById('page-table').style.display = ''; document.getElementById('fabAddBtn').classList.toggle('show', isAdmin);
   changeSheet(name); closeSidebarMobile();
