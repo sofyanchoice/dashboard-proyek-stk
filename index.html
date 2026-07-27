@@ -316,7 +316,7 @@
       <div class="nav-section-label">Halaman</div>
       <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
       <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
-      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">Usulan Teknis</span></div>
+      <div class="nav-item-link" data-sheet="Usulan Teknis" onclick="selectSheet('Usulan Teknis')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
     </div>
     <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
@@ -346,7 +346,7 @@
         <select id="dashSheetFilter" onchange="renderDashboard()">
           <option value="all">Semua Sheet Proyek</option>
           <option value="Pekerjaan">Hanya Pekerjaan</option>
-          <option value="USTEK">Hanya USTEK</option>
+          <option value="Usulan Teknis">Hanya USTEK</option>
         </select>
         <select id="dashYearFilter" onchange="renderDashboard()">
           <option value="all">Semua Tahun</option>
