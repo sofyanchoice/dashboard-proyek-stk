@@ -34,14 +34,11 @@
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
 
-    /* Perbaikan agar account menu tetap bisa diklik popup saat sidebar collapsed */
+    /* ── Account section: "geser ke atas" (accordion, mendorong isi ke atas), konsisten expanded/collapsed ── */
     .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;flex-shrink:0;}
     .account-menu{max-height:0;overflow:hidden;display:flex;flex-direction:column;gap:2px;transition:max-height .25s ease,margin-bottom .25s ease;}
     .sidebar-account.open .account-menu{max-height:220px;margin-bottom:6px;}
     
-    .sidebar.collapsed .sidebar-account{position:relative;}
-    .sidebar.collapsed .sidebar-account.open .account-menu{display:flex;position:absolute;left:100%;bottom:0;width:220px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(15,23,42,.15);padding:8px;z-index:1050;margin-bottom:0;}
-
     .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
     .account-trigger:hover{background:var(--canvas);}
     .account-trigger .account-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-size:1.05rem;}
@@ -61,6 +58,11 @@
     .sidebar.collapsed .nav-item-link{justify-content:center;padding:11px 0;}
     .sidebar.collapsed .nav-item-link i{width:auto;}
     .sidebar.collapsed .account-trigger{justify-content:center;padding:10px 0;}
+
+    /* Saat sidebar collapsed, menu akun tetap naik ke atas (accordion dalam container lebar sidebar minimal) */
+    .sidebar.collapsed .sidebar-account.open .account-menu{max-height:220px;margin-bottom:6px;}
+    .sidebar.collapsed .account-menu .nav-item-link{justify-content:center;padding:11px 0;}
+    .sidebar.collapsed .account-menu .nav-item-link span.link-label{display:none;}
 
     .main-wrapper{margin-left:var(--sidebar-w);flex:1;min-width:0;padding:24px;transition:margin-left .22s ease;}
     .sidebar.collapsed ~ .main-wrapper{margin-left:var(--sidebar-w-collapsed);}
@@ -1106,7 +1108,7 @@ function clearSelection() { selectedRows.clear(); document.querySelectorAll('.ro
 async function refreshData() {
   const btn = document.getElementById('btnRefresh'); const icon = btn.querySelector('i'); btn.disabled = true; icon.classList.add('spin'); showLoading();
   try { const d = await api('getData', { sheet: activeSheet, token: authToken }); cache[activeSheet] = d; renderTable(d); renderDashboard(); } catch (err) { showError(err.message); } btn.disabled = false; icon.classList.remove('spin');
-}
+  }
 function togglePwd(inputId, btn) {
   const inp = document.getElementById(inputId); const icon = btn.querySelector('i');
   if (inp.type === 'password') { inp.type='text'; icon.classList.replace('bi-eye','bi-eye-slash'); } else { inp.type='password'; icon.classList.replace('bi-eye-slash','bi-eye'); }
