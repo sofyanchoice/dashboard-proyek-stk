@@ -316,7 +316,7 @@
       <div class="nav-section-label">Halaman</div>
       <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
       <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
-      <div class="nav-item-link" data-sheet="Usulan Teknis" onclick="selectSheet('Usulan Teknis')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
+      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
     </div>
     <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
@@ -346,7 +346,7 @@
         <select id="dashSheetFilter" onchange="renderDashboard()">
           <option value="all">Semua Sheet Proyek</option>
           <option value="Pekerjaan">Hanya Pekerjaan</option>
-          <option value="Usulan Teknis">Hanya USTEK</option>
+          <option value="USTEK">Hanya USTEK</option>
         </select>
         <select id="dashYearFilter" onchange="renderDashboard()">
           <option value="all">Semua Tahun</option>
@@ -623,7 +623,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbz4Pa9Nh-Z6JvsTtpbgoXBP
 
 let activeSheet  = 'Pekerjaan';
 let currentPage  = 'dashboard';
-const cache      = { Pekerjaan: null, ['Usulan Teknis']: null };
+const cache      = { Pekerjaan: null, USTEK: null };
 let authToken    = null;
 let currentRole  = null;
 let loggedUsername = null;
@@ -632,7 +632,7 @@ let selectedRows = new Set();
 let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
 let sidebarCollapsed = false;
-const scrollPositions = { Pekerjaan: 0, ['Usulan Teknis']: 0 };
+const scrollPositions = { Pekerjaan: 0, USTEK: 0 };
 let tableSortable;
 let bsTooltips = [];
 
@@ -726,7 +726,7 @@ async function submitLogin(e) {
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
 }
 function clearStoredAuth() { [localStorage, sessionStorage].forEach(s => { s.removeItem(TOKEN_KEY); s.removeItem(ROLE_KEY); s.removeItem(USER_KEY); }); localStorage.removeItem(REMEMBER_KEY); }
-async function logoutApp() { if (authToken) { try { await api('logout', { token: authToken }); } catch(_){} } authToken = null; currentRole = null; isAdmin = false; loggedUsername = null; clearStoredAuth(); cache.Pekerjaan = cache.['Usulan Teknis'] = null; clearSelection(); closeAddPanel(); showLoginGate(); }
+async function logoutApp() { if (authToken) { try { await api('logout', { token: authToken }); } catch(_){} } authToken = null; currentRole = null; isAdmin = false; loggedUsername = null; clearStoredAuth(); cache.Pekerjaan = cache.USTEK = null; clearSelection(); closeAddPanel(); showLoginGate(); }
 function switchUser() { logoutApp(); setTimeout(() => document.getElementById('loginUsername').focus(), 100); }
 
 function onAuthenticated() {
@@ -738,7 +738,7 @@ function onAuthenticated() {
   clearSelection(); sortState = { column: null, direction: 'asc' }; updateSortIcons(); goToPage('dashboard'); showLoading();
   Promise.all([
     api('getData', { sheet: 'Pekerjaan', token: authToken }).then(d => { cache.Pekerjaan = d; }),
-    api('getData', { sheet: 'Usulan Teknis',     token: authToken }).then(d => { cache.['Usulan Teknis']      = d; })
+    api('getData', { sheet: 'USTEK',     token: authToken }).then(d => { cache.USTEK      = d; })
   ]).then(() => { if (cache[activeSheet]) renderTable(cache[activeSheet]); renderDashboard(); }).catch(err => showError(err.message));
 }
 
@@ -940,7 +940,7 @@ function renderTable(data) {
 
 function renderDashboard() {
   const sheetSel = document.getElementById('dashSheetFilter').value; const yearSel = document.getElementById('dashYearFilter');
-  let baseRows = sheetSel === 'all' ? [...(cache.Pekerjaan||[]), ...(cache.['Usulan Teknis']||[])] : (cache[sheetSel] || []);
+  let baseRows = sheetSel === 'all' ? [...(cache.Pekerjaan||[]), ...(cache.USTEK||[])] : (cache[sheetSel] || []);
   const years = [...new Set(baseRows.map(r => String(r[2])).filter(Boolean))].sort((a,b) => b - a); const keepYear = yearSel.value;
   yearSel.innerHTML = '<option value="all">Semua Tahun</option>' + years.map(y => `<option value="${y}">${y}</option>`).join(''); yearSel.value = years.includes(keepYear) ? keepYear : 'all';
   let rows = baseRows; if (yearSel.value !== 'all') rows = rows.filter(r => String(r[2]) === yearSel.value);
