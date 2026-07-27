@@ -34,8 +34,6 @@
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
 
-    /* ── Account section: "geser ke atas" (accordion, mendorong isi ke atas),
-         bukan popup melayang di atas konten lain ── */
     .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;flex-shrink:0;}
     .account-menu{max-height:0;overflow:hidden;display:flex;flex-direction:column;gap:2px;transition:max-height .25s ease,margin-bottom .25s ease;}
     .sidebar-account.open .account-menu{max-height:220px;margin-bottom:6px;}
@@ -64,8 +62,6 @@
     .sidebar.collapsed ~ .main-wrapper{margin-left:var(--sidebar-w-collapsed);}
     .app-topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
 
-    /* Tombol hamburger (mobile) — disembunyikan secara default di desktop.
-       Hanya dimunculkan lewat media query di bawah untuk layar sempit. */
     .sidebar-toggle-btn{display:none;}
 
     @media(max-width:900px){
@@ -97,7 +93,7 @@
     .search-box .btn{border:none;border-left:1px solid var(--line);border-radius:0;background:transparent;}
     .card-header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
-    /* ── TABEL FIXED & TEXT WRAPPED (Membungkus teks agar tampil penuh) ── */
+    /* ── TABEL FIXED & TEXT WRAPPED ── */
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
     #dataTable{table-layout:fixed;width:100%;min-width:1050px;margin-bottom:0;}
     #dataTable th, #dataTable td{vertical-align:middle;padding:12px 14px;font-size:.9rem;}
@@ -118,25 +114,6 @@
       .card-header .header-actions{flex-wrap:wrap;}
       .card-header .header-actions .filtered-count{order:-1;width:100%;text-align:left;}
       .card-header .header-actions .search-box{flex:1 1 100%;}
-
-      #dataTable { min-width: 100%; display:block;}
-      #dataTable thead { display: none; }
-      #dataTable tbody tr {
-        display: flex; flex-direction: column;
-        border: 1px solid var(--line); border-radius: 12px;
-        margin: 10px 14px; padding: 12px; background: var(--surface);
-        box-shadow: 0 2px 4px rgba(15,23,42,0.03);
-      }
-      #dataTable tbody td {
-        display: flex; justify-content: space-between; align-items: center;
-        border-bottom: 1px dashed var(--line); padding: 8px 0; text-align: right;
-      }
-      #dataTable tbody td:last-child { border-bottom: none; }
-      #dataTable tbody td::before {
-        content: attr(data-label); font-weight: 700; color: var(--ink-soft);
-        text-align: left; margin-right: 15px; font-size: 0.85rem;
-      }
-      #dataTable tbody td:empty { display: none; }
     }
 
     .drag-handle { cursor: grab; padding: 4px; border-radius: 4px; transition: background 0.15s; color: var(--ink-soft); }
@@ -840,8 +817,6 @@ function initDragAndDrop() {
     handle: '.drag-handle', animation: 200, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
     multiDrag: true, selectedClass: 'is-selected', fallbackTolerance: 3,
     onChoose: function(evt) {
-      // Jika baris yang mulai di-drag adalah bagian dari data yang sudah dicentang (>1),
-      // ikutkan semua baris terpilih lain ke dalam drag ini (batch reorder).
       const no = evt.item.dataset.no;
       if (selectedRows.size > 1 && selectedRows.has(no)) {
         document.querySelectorAll('#tableBody tr').forEach(tr => {
