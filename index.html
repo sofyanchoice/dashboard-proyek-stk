@@ -34,10 +34,14 @@
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
 
+    /* Perbaikan agar account menu tetap bisa diklik popup saat sidebar collapsed */
     .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;flex-shrink:0;}
     .account-menu{max-height:0;overflow:hidden;display:flex;flex-direction:column;gap:2px;transition:max-height .25s ease,margin-bottom .25s ease;}
     .sidebar-account.open .account-menu{max-height:220px;margin-bottom:6px;}
-    .sidebar.collapsed .account-menu{display:none;}
+    
+    .sidebar.collapsed .sidebar-account{position:relative;}
+    .sidebar.collapsed .sidebar-account.open .account-menu{display:flex;position:absolute;left:100%;bottom:0;width:220px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(15,23,42,.15);padding:8px;z-index:1050;margin-bottom:0;}
+
     .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
     .account-trigger:hover{background:var(--canvas);}
     .account-trigger .account-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-size:1.05rem;}
@@ -212,6 +216,12 @@
     .year-row .year-bar-track{flex:1;height:12px;border-radius:999px;background:var(--canvas);overflow:hidden;}
     .year-row .year-bar-fill{height:100%;background: linear-gradient(90deg, var(--brand) 0%, #60a5fa 100%); border-radius:999px;transition:width .5s ease;}
     .year-row .year-count{width:34px;text-align:right;font-size:.82rem;color:var(--ink);font-weight:800;flex-shrink:0;}
+
+    /* Styling tambahan untuk list PIC utama di dashboard */
+    .pic-work-list { display: flex; flex-direction: column; gap: 10px; }
+    .pic-work-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--canvas); border-radius: 10px; border: 1px solid var(--line); }
+    .pic-work-info { display: flex; align-items: center; gap: 10px; }
+    .pic-work-badge { font-weight: 800; font-size: 0.9rem; background: var(--brand-soft); color: var(--brand); padding: 4px 10px; border-radius: 999px; }
 
     .fab-btn{position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;border:none;display:none;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 20px rgba(37,99,235,.35);z-index:1045;transition:transform .15s,background .15s;}
     .fab-btn:hover{transform:scale(1.06);background:#1d4ed8;color:#fff;}
@@ -389,6 +399,20 @@
             <div class="card-header"><h5 class="mb-0 fw-bold"><i class="bi bi-calendar3 me-2 text-primary"></i>Sebaran Tahun</h5></div>
             <div class="card-body">
               <div class="year-breakdown" id="yearBreakdown"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tambahan Card PIC Utama dan Jumlah Pekerjaan -->
+      <div class="row g-4 mt-1">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header"><h5 class="mb-0 fw-bold"><i class="bi bi-people-fill me-2 text-primary"></i>Beban Kerja PIC Utama (Penanggung Jawab Pertama)</h5></div>
+            <div class="card-body">
+              <div class="pic-work-list" id="picWorkList">
+                <p class="text-muted text-center mb-0 py-3">Memuat data PIC...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -810,25 +834,28 @@ async function applyInlineChecklist(no, field, value) {
   try { let d; if (rows.length > 1) { d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue: null, collectedValue: field === 'collected' ? value : null, uploadedValue: field === 'uploaded' ? value : null }); } else { const row = rows[0]; d = await api('saveData', { sheetName: activeSheet, token: authToken, no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4], statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing', collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'), uploaded: field==='uploaded' ? value : (row[7]===true||row[7]==='TRUE'), keterangan: row[8]||'' }); } cache[activeSheet] = d; renderTable(d); renderDashboard(); showToast('Checklist berhasil diperbarui.', 'success'); } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading();
 }
 
-// ── Drag & drop reorder — mendukung batch reorder untuk baris yang sudah diseleksi ──
+// ── Perbaikan bug batch reorder: Menggunakan array instance murni dari event untuk mencegah carry-over multiple selection item sebelumnya ──
 function initDragAndDrop() {
   const tbody = document.getElementById('tableBody'); if (tableSortable) { tableSortable.destroy(); } if (!isAdmin) return;
   tableSortable = new Sortable(tbody, {
     handle: '.drag-handle', animation: 200, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
     multiDrag: true, selectedClass: 'is-selected', fallbackTolerance: 3,
-    onChoose: function(evt) {
-      const no = evt.item.dataset.no;
-      if (selectedRows.size > 1 && selectedRows.has(no)) {
-        document.querySelectorAll('#tableBody tr').forEach(tr => {
-          if (selectedRows.has(tr.dataset.no)) Sortable.utils.select(tr);
-        });
-      }
-    },
     onEnd: async function(evt) {
-      if (evt.oldIndex === evt.newIndex && (!evt.items || !evt.items.length)) return;
-      let draggedEls = (evt.items && evt.items.length > 0) ? evt.items : [evt.item];
-      let fromNos = draggedEls.map(el => el.dataset.no);
+      // Ambil elemen yang benar-benar digeser secara spesifik dari event sekarang
+      let draggedEls = [];
+      if (evt.items && evt.items.length > 0) {
+        draggedEls = evt.items;
+      } else if (evt.item) {
+        draggedEls = [evt.item];
+      }
+      
+      let fromNos = draggedEls.map(el => el.dataset.no).filter(Boolean);
+      if (!fromNos.length && evt.oldDragged) {
+        fromNos = [evt.oldDragged.dataset.no];
+      }
       let targetIndex = evt.newIndex;
+
+      if (!fromNos.length) return;
 
       if (fromNos.length > 1) {
         const ok = await showConfirm(`Pindahkan ${fromNos.length} data terpilih ke urutan baru?`, {title: 'Batch Move Data'});
@@ -923,6 +950,44 @@ function renderDashboard() {
   const yearsSorted = Object.keys(counts).sort((a,b) => b - a); const maxCount = Math.max(1, ...Object.values(counts)); const yb = document.getElementById('yearBreakdown');
   if (!yearsSorted.length) { yb.innerHTML = '<p class="text-muted text-center mb-0 mt-3 py-4">Belum ada data proyek pada periode ini.</p>'; }
   else { yb.innerHTML = yearsSorted.map(y => `<div class="year-row"><span class="year-label">${y}</span><div class="year-bar-track"><div class="year-bar-fill" style="width:${(counts[y] / maxCount * 100)}%"></div></div><span class="year-count">${counts[y]}</span></div>`).join(''); }
+
+  // Render Beban Kerja PIC Utama (Nama Pertama)
+  const picCounts = {};
+  rows.forEach(r => {
+    const rawPic = String(r[4] || '').trim();
+    if (!rawPic || rawPic === '-') return;
+    // Ambil nama pertama (sebelum koma pertama)
+    const firstPic = rawPic.split(',')[0].trim();
+    if (firstPic) {
+      picCounts[firstPic] = (picCounts[firstPic] || 0) + 1;
+    }
+  });
+
+  const picListContainer = document.getElementById('picWorkList');
+  const sortedPics = Object.keys(picCounts).sort((a, b) => picCounts[b] - picCounts[a]);
+
+  if (!sortedPics.length) {
+    picListContainer.innerHTML = '<p class="text-muted text-center mb-0 py-3">Belum ada data PIC utama yang terdaftar.</p>';
+  } else {
+    picListContainer.innerHTML = sortedPics.map(picName => {
+      const count = picCounts[picName];
+      const color = hashColor(picName);
+      const parts = picName.split(/\s+/).filter(Boolean);
+      const initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : picName.substring(0,2).toUpperCase();
+      return `
+        <div class="pic-work-item">
+          <div class="pic-work-info">
+            <span class="pic-avatar" style="width:36px;height:36px;background:${color};font-size:.85rem;">${initials}</span>
+            <div>
+              <div class="fw-bold text-dark" style="font-size:.92rem;">${picName}</div>
+              <div class="text-muted small">Penanggung Jawab Utama</div>
+            </div>
+          </div>
+          <span class="pic-work-badge">${count} Proyek</span>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function sortByColumn(col, type) {
