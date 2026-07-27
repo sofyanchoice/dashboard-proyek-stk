@@ -52,6 +52,7 @@
     .main-wrapper{margin-left:var(--sidebar-w);flex:1;min-width:0;padding:24px;transition:margin-left .22s ease;}
     .sidebar.collapsed ~ .main-wrapper{margin-left:var(--sidebar-w-collapsed);}
     .app-topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+    
     @media(max-width:900px){
       .sidebar{transform:translateX(-100%);width:var(--sidebar-w) !important;}
       .sidebar.open{transform:translateX(0);}
@@ -66,7 +67,7 @@
     .role-badge.admin{background:var(--done-soft);color:var(--done);}
     .role-badge.user{background:var(--user-soft);color:var(--user-c);}
 
-    /* ── Account menu (collapsible, opens upward) ── */
+    /* ── Account menu ── */
     .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
     .account-trigger:hover{background:var(--canvas);}
     .account-trigger .account-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--brand-soft);color:var(--brand);font-size:1.05rem;}
@@ -82,10 +83,6 @@
     .card{border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);margin-bottom:20px;background:var(--surface);}
     .card-header{background:var(--surface);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0 !important;padding:16px 20px;}
 
-    .form-label{font-weight:600;font-size:.85rem;color:var(--ink-soft);margin-bottom:6px;}
-    .form-control,.form-select{border-radius:8px;border-color:var(--line);padding:10px 12px;}
-    .form-control:focus,.form-select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);}
-
     .toggle-chip-group{display:flex;gap:10px;flex-wrap:wrap;}
     .btn-check+label.toggle-chip{display:flex;align-items:center;gap:8px;flex:1;min-width:140px;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--ink-soft);font-weight:600;font-size:.88rem;cursor:pointer;transition:all .15s;background:var(--surface);}
     .btn-check:checked+label.toggle-chip{border-color:var(--brand);background:var(--brand-soft);color:var(--brand);}
@@ -96,24 +93,54 @@
     .search-box:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft);}
     .search-box .input-group-text{background:transparent;border:none;}
     .search-box .form-control{border:none;box-shadow:none !important;background:transparent;}
-    .search-box .form-control:focus{border:none;box-shadow:none !important;}
     .search-box .btn{border:none;border-left:1px solid var(--line);border-radius:0;background:transparent;}
     .card-header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-    @media(max-width:768px){
-      .search-box{width:100%;}
-      .card-header.d-flex{flex-direction:column;align-items:stretch!important;gap:10px;}
-      .card-header .header-actions{flex-wrap:wrap;}
-      .card-header .header-actions .filtered-count{order:-1;width:100%;text-align:left;}
-      .card-header .header-actions .search-box{flex:1 1 100%;}
-    }
 
+    /* ── Responsive Table & Mobile Cards (2A) ── */
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
     #dataTable{table-layout:auto;width:100%;min-width:860px;margin-bottom:0;}
     #dataTable th,#dataTable td{white-space:normal;word-wrap:break-word;vertical-align:middle;padding:12px 14px;font-size:.9rem;}
     #dataTable thead th{position:sticky;top:0;z-index:2;background:#f8fafc;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
     #dataTable tbody tr:hover{background:#f8fafc;}
     #dataTable tbody td{border-bottom:1px solid var(--line);}
-    @media(max-width:576px){#dataTable th,#dataTable td{padding:10px;font-size:.83rem;}}
+    
+    @media(max-width:768px){
+      .search-box{width:100%;}
+      .card-header.d-flex{flex-direction:column;align-items:stretch!important;gap:10px;}
+      .card-header .header-actions{flex-wrap:wrap;}
+      .card-header .header-actions .filtered-count{order:-1;width:100%;text-align:left;}
+      .card-header .header-actions .search-box{flex:1 1 100%;}
+      
+      /* Konversi Table ke Card List */
+      #dataTable { min-width: 100%; }
+      #dataTable thead { display: none; }
+      #dataTable tbody tr { 
+        display: flex; flex-direction: column; 
+        border: 1px solid var(--line); border-radius: 12px; 
+        margin: 10px 14px; padding: 12px; background: var(--surface);
+        box-shadow: 0 2px 4px rgba(15,23,42,0.03);
+      }
+      #dataTable tbody td { 
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px dashed var(--line); padding: 8px 0; text-align: right;
+      }
+      #dataTable tbody td:last-child { border-bottom: none; }
+      #dataTable tbody td::before { 
+        content: attr(data-label); font-weight: 700; color: var(--ink-soft); 
+        text-align: left; margin-right: 15px; font-size: 0.85rem;
+      }
+      /* Spesifik item */
+      #dataTable tbody td .pic-avatars { align-items: flex-end; }
+      #dataTable tbody td .checklist-icons { justify-content: flex-end; }
+      #dataTable tbody td:empty { display: none; }
+    }
+
+    /* Drag and Drop styles (1C) */
+    .drag-handle { cursor: grab; padding: 4px; border-radius: 4px; transition: background 0.15s; }
+    .drag-handle:hover { background: var(--canvas); }
+    .drag-handle:active { cursor: grabbing; }
+    .sortable-ghost { opacity: 0.4; background-color: var(--brand-soft) !important; }
+    .sortable-drag { background-color: var(--surface) !important; box-shadow: 0 10px 20px rgba(15,23,42,.15); }
 
     .sortable{cursor:pointer;user-select:none;white-space:nowrap;}
     .sortable .th-inner{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
@@ -153,7 +180,6 @@
     .password-toggle-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:transparent;color:var(--ink-soft);width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;}
     .password-toggle-btn:hover{background:var(--canvas);color:var(--ink);}
 
-    /* Confirm/warning modal accent so it's visible against white */
     #confirmModal .modal-content{border:1px solid var(--line);}
     #confirmModal .modal-content.is-danger{border-top:4px solid var(--danger);}
     #confirmModal .modal-content.is-primary{border-top:4px solid var(--brand);}
@@ -166,7 +192,6 @@
     .login-card .icon-badge img{height:100%;width:auto;display:block;}
     .login-card h4{font-weight:800;text-align:center;margin-bottom:4px;letter-spacing:-.01em;}
     .login-card .login-subtitle{text-align:center;color:var(--ink-soft);font-size:.88rem;margin-bottom:24px;}
-    .login-card .form-check-label{font-size:.88rem;color:var(--ink-soft);}
     @media(max-width:420px){.login-card{padding:26px 20px;}}
 
     #gasBanner{background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:.88rem;display:none;}
@@ -266,20 +291,20 @@
     <p class="login-subtitle">Daftar Proyek CV.Selaras Tirta Karya</p>
 
     <form id="loginForm" onsubmit="submitLogin(event)">
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input type="text" class="form-control" id="loginUsername" required autocomplete="username" placeholder="Masukkan username">
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="loginUsername" required autocomplete="username" placeholder="Username">
+        <label>Username</label>
       </div>
       <div class="mb-3">
-        <label class="form-label">Password</label>
-        <div class="password-field">
-          <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password" placeholder="Masukkan password">
+        <div class="password-field form-floating">
+          <input type="password" class="form-control" id="loginPassword" required autocomplete="current-password" placeholder="Password">
+          <label>Password</label>
           <button type="button" class="password-toggle-btn" onclick="togglePwd('loginPassword',this)"><i class="bi bi-eye"></i></button>
         </div>
       </div>
       <div class="form-check mb-3">
         <input class="form-check-input" type="checkbox" id="rememberMe">
-        <label class="form-check-label" for="rememberMe">Ingat saya di perangkat ini (30 hari)</label>
+        <label class="form-check-label text-muted" for="rememberMe" style="font-size: 0.88rem;">Ingat saya di perangkat ini (30 hari)</label>
       </div>
       <div class="text-danger small mb-2" id="loginError" style="display:none;"></div>
       <button type="submit" class="btn btn-primary w-100" id="btnLoginSubmit">
@@ -357,15 +382,15 @@
         <div class="card-body">
           <div class="progress-block">
             <div class="progress-label"><span>Penyelesaian Pekerjaan (Done)</span><span id="pbDoneText">0%</span></div>
-            <div class="progress"><div class="progress-bar" id="pbDone" style="width:0%;background:var(--done);"></div></div>
+            <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" id="pbDone" style="width:0%;background:var(--done);"></div></div>
           </div>
           <div class="progress-block">
             <div class="progress-label"><span>Dokumen Collected</span><span id="pbCollectedText">0%</span></div>
-            <div class="progress"><div class="progress-bar" id="pbCollected" style="width:0%;background:var(--brand);"></div></div>
+            <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" id="pbCollected" style="width:0%;background:var(--brand);"></div></div>
           </div>
           <div class="progress-block">
             <div class="progress-label"><span>Dokumen Uploaded to NAS</span><span id="pbUploadedText">0%</span></div>
-            <div class="progress"><div class="progress-bar" id="pbUploaded" style="width:0%;background:var(--user-c);"></div></div>
+            <div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" id="pbUploaded" style="width:0%;background:var(--user-c);"></div></div>
           </div>
         </div>
       </div>
@@ -423,7 +448,7 @@
 <!-- FAB Tambah Data -->
 <button type="button" class="fab-btn" id="fabAddBtn" onclick="openAddPanel()" title="Tambah Data Baru"><i class="bi bi-plus-lg"></i></button>
 
-<!-- Floating panel: Tambah Data -->
+<!-- Floating panel: Tambah Data (Floating Labels 2C) -->
 <div class="add-panel-backdrop" id="addPanelBackdrop" onclick="closeAddPanel()"></div>
 <div class="add-panel" id="addPanel">
   <div class="add-panel-header">
@@ -432,16 +457,41 @@
   </div>
   <form id="projectForm" onsubmit="submitData(event)" class="d-flex flex-column flex-grow-1" style="min-height:0;">
     <div class="add-panel-body">
-      <div class="mb-3"><label class="form-label">Judul Pekerjaan</label><input type="text" class="form-control" id="judul" required placeholder="Masukkan judul pekerjaan"></div>
-      <div class="row g-3 mb-3">
-        <div class="col-6"><label class="form-label">Tahun</label><input type="number" class="form-control" id="tahun" required></div>
-        <div class="col-6"><label class="form-label">Jenis Pekerjaan</label><input type="text" class="form-control" id="jenis" placeholder="Contoh: DED"></div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="judul" required placeholder="Judul Pekerjaan">
+        <label for="judul">Judul Pekerjaan</label>
       </div>
-      <div class="mb-3"><label class="form-label">PIC</label><input type="text" class="form-control" id="pic" required placeholder="Contoh: Budi, Sari (pisahkan koma jika lebih dari satu)"></div>
-      <div class="mb-3"><label class="form-label">Status</label><select class="form-select" id="statusPekerjaan"><option value="Ongoing">Ongoing</option><option value="Done">Done</option></select></div>
-      <div class="mb-3"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="keterangan" placeholder="Opsional"></div>
-      <div>
-        <label class="form-label">Checklist Dokumen</label>
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <div class="form-floating">
+            <input type="number" class="form-control" id="tahun" required placeholder="Tahun">
+            <label for="tahun">Tahun</label>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-floating">
+            <input type="text" class="form-control" id="jenis" placeholder="Contoh: DED">
+            <label for="jenis">Jenis Pekerjaan</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="pic" required placeholder="Contoh: Budi, Sari">
+        <label for="pic">PIC (pisahkan koma jika > 1)</label>
+      </div>
+      <div class="form-floating mb-3">
+        <select class="form-select" id="statusPekerjaan" aria-label="Status">
+          <option value="Ongoing">Ongoing</option>
+          <option value="Done">Done</option>
+        </select>
+        <label for="statusPekerjaan">Status</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="keterangan" placeholder="Keterangan">
+        <label for="keterangan">Keterangan (Opsional)</label>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" style="font-size: 0.85rem; color: var(--ink-soft); font-weight: 600;">Checklist Dokumen</label>
         <div class="toggle-chip-group">
           <input type="checkbox" class="btn-check" id="collected" autocomplete="off">
           <label class="toggle-chip" for="collected"><i class="bi bi-file-earmark-check"></i> Collected</label>
@@ -457,7 +507,7 @@
   </form>
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Modal (Floating Labels 2C) -->
 <div class="modal fade" id="editModal" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -469,19 +519,53 @@
         <div class="modal-body">
           <input type="hidden" id="edit_no">
           <div class="row g-3 mb-3">
-            <div class="col-md-8"><label class="form-label">Judul Pekerjaan</label><input type="text" class="form-control" id="edit_judul" required></div>
-            <div class="col-md-4"><label class="form-label">Tahun</label><input type="number" class="form-control" id="edit_tahun" required></div>
+            <div class="col-md-8">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="edit_judul" required placeholder="Judul Pekerjaan">
+                <label for="edit_judul">Judul Pekerjaan</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="number" class="form-control" id="edit_tahun" required placeholder="Tahun">
+                <label for="edit_tahun">Tahun</label>
+              </div>
+            </div>
           </div>
           <div class="row g-3 mb-3">
-            <div class="col-md-6"><label class="form-label">Jenis Pekerjaan</label><input type="text" class="form-control" id="edit_jenis"></div>
-            <div class="col-md-6"><label class="form-label">PIC</label><input type="text" class="form-control" id="edit_pic" required placeholder="Pisahkan koma jika lebih dari satu"></div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="edit_jenis" placeholder="Jenis Pekerjaan">
+                <label for="edit_jenis">Jenis Pekerjaan</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="edit_pic" required placeholder="PIC">
+                <label for="edit_pic">PIC (pisahkan koma jika > 1)</label>
+              </div>
+            </div>
           </div>
           <div class="row g-3 mb-3">
-            <div class="col-md-5"><label class="form-label">Status</label><select class="form-select" id="edit_status"><option value="Ongoing">Ongoing</option><option value="Done">Done</option></select></div>
-            <div class="col-md-7"><label class="form-label">Keterangan</label><input type="text" class="form-control" id="edit_keterangan"></div>
+            <div class="col-md-5">
+              <div class="form-floating">
+                <select class="form-select" id="edit_status" aria-label="Status">
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Done">Done</option>
+                </select>
+                <label for="edit_status">Status</label>
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="edit_keterangan" placeholder="Keterangan">
+                <label for="edit_keterangan">Keterangan (Opsional)</label>
+              </div>
+            </div>
           </div>
           <div class="row g-3">
-            <div class="col-12"><label class="form-label">Checklist Dokumen</label>
+            <div class="col-12">
+              <label class="form-label" style="font-size: 0.85rem; color: var(--ink-soft); font-weight: 600;">Checklist Dokumen</label>
               <div class="toggle-chip-group">
                 <input type="checkbox" class="btn-check" id="edit_collected" autocomplete="off">
                 <label class="toggle-chip" for="edit_collected"><i class="bi bi-file-earmark-check"></i> Collected</label>
@@ -510,15 +594,40 @@
       <form id="credForm" onsubmit="submitChangeCred(event)">
         <div class="modal-header"><h5 class="modal-title fw-bold"><i class="bi bi-key me-2 text-primary"></i>Ubah Username / Password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <div class="modal-body">
-          <div class="mb-3"><label class="form-label">Akun</label><select class="form-select" id="cred_role"><option value="admin">Admin</option><option value="user">User</option></select></div>
+          <div class="form-floating mb-3">
+            <select class="form-select" id="cred_role" aria-label="Akun"><option value="admin">Admin</option><option value="user">User</option></select>
+            <label for="cred_role">Akun</label>
+          </div>
           <div class="row g-3 mb-2">
-            <div class="col-md-6"><label class="form-label">Username saat ini</label><input type="text" class="form-control" id="cred_curUser" required></div>
-            <div class="col-md-6"><label class="form-label">Password saat ini</label><div class="password-field"><input type="password" class="form-control" id="cred_curPass" required><button type="button" class="password-toggle-btn" onclick="togglePwd('cred_curPass',this)"><i class="bi bi-eye"></i></button></div></div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="cred_curUser" required placeholder="Username">
+                <label for="cred_curUser">Username saat ini</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="password-field form-floating">
+                <input type="password" class="form-control" id="cred_curPass" required placeholder="Password">
+                <label for="cred_curPass">Password saat ini</label>
+                <button type="button" class="password-toggle-btn" onclick="togglePwd('cred_curPass',this)"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
           </div>
           <hr>
           <div class="row g-3">
-            <div class="col-md-6"><label class="form-label">Username baru</label><input type="text" class="form-control" id="cred_newUser" required></div>
-            <div class="col-md-6"><label class="form-label">Password baru</label><div class="password-field"><input type="password" class="form-control" id="cred_newPass" required minlength="4"><button type="button" class="password-toggle-btn" onclick="togglePwd('cred_newPass',this)"><i class="bi bi-eye"></i></button></div></div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="cred_newUser" required placeholder="Baru">
+                <label for="cred_newUser">Username baru</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="password-field form-floating">
+                <input type="password" class="form-control" id="cred_newPass" required minlength="4" placeholder="Password Baru">
+                <label for="cred_newPass">Password baru</label>
+                <button type="button" class="password-toggle-btn" onclick="togglePwd('cred_newPass',this)"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
           </div>
           <div class="text-danger small mt-3" id="credErr" style="display:none;"></div>
           <div class="text-success small mt-3" id="credOk" style="display:none;"></div>
@@ -529,28 +638,7 @@
   </div>
 </div>
 
-<!-- Ubah Urutan Modal -->
-<div class="modal fade" id="moveModal" tabindex="-1" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form id="moveForm" onsubmit="submitMoveRow(event)">
-        <div class="modal-header"><h5 class="modal-title fw-bold"><i class="bi bi-arrows-move me-2 text-primary"></i>Ubah Urutan Data</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-          <p class="text-muted small mb-3">Pindahkan data <strong id="moveLabel"></strong> ke nomor urut baru.</p>
-          <input type="hidden" id="move_fromNo">
-          <div class="row g-3">
-            <div class="col-6"><label class="form-label">Nomor urut saat ini</label><input type="text" class="form-control" id="move_currentNo" disabled></div>
-            <div class="col-6"><label class="form-label">Pindah ke nomor urut</label><input type="number" class="form-control" id="move_toNo" min="1" required></div>
-          </div>
-          <div class="text-danger small mt-3" id="moveErr" style="display:none;"></div>
-        </div>
-        <div class="modal-footer"><button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary" id="btnMoveSubmit"><i class="bi bi-arrows-move me-1"></i> Pindahkan</button></div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Confirm Modal (pengganti confirm() bawaan browser) -->
+<!-- Confirm Modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -568,6 +656,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- 1C: CDN Library Drag and Drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 <script>
 // ============================================================
 // ⚙️  KONFIGURASI — URL APPS SCRIPT
@@ -588,6 +679,8 @@ let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
 let sidebarCollapsed = false;
 const scrollPositions = { Pekerjaan: 0, USTEK: 0 };
+let tableSortable; // Instance SortableJS
+let bsTooltips = []; // Menyimpan instance tooltip (1B)
 
 const TOKEN_KEY  = 'stkAuthToken';
 const ROLE_KEY   = 'stkAuthRole';
@@ -596,25 +689,22 @@ const REMEMBER_KEY = 'stkRemember';
 const SIDEBAR_KEY  = 'stkSidebarCollapsed';
 
 // ── Modal instances ─────────────────────────────────────────
-let editModal, credModal, moveModal, confirmModal;
+let editModal, credModal, confirmModal;
 let confirmResolver = null;
-
-// ── Modal stack (ESC hanya menutup dialog paling atas) ──────
 const modalStack = [];
+
 function registerModal(el, instance) {
-  el.addEventListener('shown.bs.modal', () => {
-    modalStack.push({ el, instance });
-  });
+  el.addEventListener('shown.bs.modal', () => { modalStack.push({ el, instance }); });
   el.addEventListener('hidden.bs.modal', () => {
     const idx = modalStack.findIndex(m => m.el === el);
     if (idx !== -1) modalStack.splice(idx, 1);
   });
 }
+
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   if (!modalStack.length) return;
-  e.preventDefault();
-  e.stopPropagation();
+  e.preventDefault(); e.stopPropagation();
   const top = modalStack[modalStack.length - 1];
   top.instance.hide();
 });
@@ -641,12 +731,10 @@ async function api(action, body = {}) {
 window.addEventListener('DOMContentLoaded', () => {
   editModal   = new bootstrap.Modal(document.getElementById('editModal'));
   credModal   = new bootstrap.Modal(document.getElementById('credModal'));
-  moveModal   = new bootstrap.Modal(document.getElementById('moveModal'));
   confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
   registerModal(document.getElementById('editModal'), editModal);
   registerModal(document.getElementById('credModal'), credModal);
-  registerModal(document.getElementById('moveModal'), moveModal);
   registerModal(document.getElementById('confirmModal'), confirmModal);
 
   document.getElementById('btnConfirmOk').addEventListener('click', () => {
@@ -660,35 +748,45 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('tahun').value = new Date().getFullYear();
 
+  // 1A: Implementasi Debounce pada Pencarian
+  let searchTimeout;
   document.getElementById('searchInput').addEventListener('input', function() {
-    filterTable();
-    document.getElementById('btnClearSearch').style.display = this.value ? '' : 'none';
+    clearTimeout(searchTimeout);
+    const val = this.value;
+    document.getElementById('btnClearSearch').style.display = val ? '' : 'none';
+    
+    // Jeda 300ms sebelum filter agar UI tidak ngelag
+    searchTimeout = setTimeout(() => {
+      filterTable();
+    }, 300);
   });
 
   if (!GAS_URL || GAS_URL.startsWith('GANTI')) {
     document.getElementById('gasBanner').classList.add('show');
   }
 
-  // Tutup popover inline-edit & account menu saat klik di luar
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.inline-edit-pop') && !e.target.closest('.editable')) {
-      closeInlineEditPop();
-    }
-    if (!e.target.closest('#sidebarAccount')) {
-      document.getElementById('sidebarAccount')?.classList.remove('open');
-    }
+    if (!e.target.closest('.inline-edit-pop') && !e.target.closest('.editable')) { closeInlineEditPop(); }
+    if (!e.target.closest('#sidebarAccount')) { document.getElementById('sidebarAccount')?.classList.remove('open'); }
   });
 
-  // Simpan posisi scroll tabel per sheet supaya tidak "ikut" saat pindah tab
   document.getElementById('tableShell').addEventListener('scroll', function() {
     scrollPositions[activeSheet] = this.scrollTop;
   });
 
   sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1';
   applySidebarCollapsed();
-
   attemptAutoLogin();
 });
+
+// 1B: Fungsi Inisialisasi Tooltips
+function initTooltips() {
+  // Hapus instance tooltip lama sebelum render yang baru
+  bsTooltips.forEach(t => t.dispose());
+  bsTooltips = [];
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  bsTooltips = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+}
 
 // ── Auth ────────────────────────────────────────────────────
 async function attemptAutoLogin() {
@@ -696,7 +794,6 @@ async function attemptAutoLogin() {
   const storage  = remember ? localStorage : sessionStorage;
   const token    = storage.getItem(TOKEN_KEY);
   if (!token) { showLoginForm(); return; }
-
   try {
     const r = await api('validateToken', { token });
     if (r && r.valid) {
@@ -707,19 +804,9 @@ async function attemptAutoLogin() {
   } catch (_) { showLoginForm(); }
 }
 
-function showLoginGate() {
-  document.getElementById('loginGate').classList.remove('d-none');
-  document.getElementById('appRoot').style.display = 'none';
-  showLoginForm();
-}
-function hideLoginGate() {
-  document.getElementById('loginGate').classList.add('d-none');
-  document.getElementById('appRoot').style.display = 'flex';
-}
-function showLoginForm() {
-  document.getElementById('authChecking').classList.add('d-none');
-  document.getElementById('loginCardWrapper').classList.remove('d-none');
-}
+function showLoginGate() { document.getElementById('loginGate').classList.remove('d-none'); document.getElementById('appRoot').style.display = 'none'; showLoginForm(); }
+function hideLoginGate() { document.getElementById('loginGate').classList.add('d-none'); document.getElementById('appRoot').style.display = 'flex'; }
+function showLoginForm() { document.getElementById('authChecking').classList.add('d-none'); document.getElementById('loginCardWrapper').classList.remove('d-none'); }
 
 async function submitLogin(e) {
   e.preventDefault();
@@ -728,19 +815,14 @@ async function submitLogin(e) {
   const remember = document.getElementById('rememberMe').checked;
   const btn = document.getElementById('btnLoginSubmit');
   const errEl = document.getElementById('loginError');
-  errEl.style.display = 'none';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
-
+  errEl.style.display = 'none'; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
   try {
     const r = await api('login', { username, password, rememberMe: remember });
     if (r && r.success) {
       authToken = r.token; currentRole = r.role; isAdmin = r.role === 'admin';
       loggedUsername = username;
       const storage = remember ? localStorage : sessionStorage;
-      storage.setItem(TOKEN_KEY, r.token);
-      storage.setItem(ROLE_KEY, r.role);
-      storage.setItem(USER_KEY, username);
+      storage.setItem(TOKEN_KEY, r.token); storage.setItem(ROLE_KEY, r.role); storage.setItem(USER_KEY, username);
       if (remember) localStorage.setItem(REMEMBER_KEY, '1');
       document.getElementById('loginForm').reset();
       hideLoginGate(); onAuthenticated();
@@ -748,28 +830,17 @@ async function submitLogin(e) {
       errEl.textContent = (r && r.message) || 'Username atau password salah.';
       errEl.style.display = 'block';
     }
-  } catch (err) {
-    errEl.textContent = err.message;
-    errEl.style.display = 'block';
-  }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
+  } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+  btn.disabled = false; btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Masuk';
 }
 
-function clearStoredAuth() {
-  [localStorage, sessionStorage].forEach(s => {
-    s.removeItem(TOKEN_KEY); s.removeItem(ROLE_KEY); s.removeItem(USER_KEY);
-  });
-  localStorage.removeItem(REMEMBER_KEY);
-}
-
+function clearStoredAuth() { [localStorage, sessionStorage].forEach(s => { s.removeItem(TOKEN_KEY); s.removeItem(ROLE_KEY); s.removeItem(USER_KEY); }); localStorage.removeItem(REMEMBER_KEY); }
 async function logoutApp() {
   if (authToken) { try { await api('logout', { token: authToken }); } catch(_){} }
   authToken = null; currentRole = null; isAdmin = false; loggedUsername = null;
   clearStoredAuth(); cache.Pekerjaan = cache.USTEK = null;
   clearSelection(); closeAddPanel(); showLoginGate();
 }
-
 function switchUser() { logoutApp(); setTimeout(() => document.getElementById('loginUsername').focus(), 100); }
 
 function onAuthenticated() {
@@ -779,27 +850,17 @@ function onAuthenticated() {
   showLoading();
   Promise.all([
     api('getData', { sheet: 'Pekerjaan', token: authToken }).then(d => { cache.Pekerjaan = d; }),
-    api('getData', { sheet: 'USTEK',     token: authToken }).then(d => { cache.USTEK     = d; })
+    api('getData', { sheet: 'USTEK',     token: authToken }).then(d => { cache.USTEK      = d; })
   ]).then(() => {
     if (cache[activeSheet]) renderTable(cache[activeSheet]);
     renderDashboard();
   }).catch(err => showError(err.message));
 }
 
-// ── Sidebar / navigasi halaman ─────────────────────────────
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarBackdrop').classList.toggle('show');
-}
-function closeSidebarMobile() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('show');
-}
-function toggleSidebarCollapse() {
-  sidebarCollapsed = !sidebarCollapsed;
-  localStorage.setItem(SIDEBAR_KEY, sidebarCollapsed ? '1' : '0');
-  applySidebarCollapsed();
-}
+// ── Sidebar / navigasi ─────────────────────────────
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarBackdrop').classList.toggle('show'); }
+function closeSidebarMobile() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarBackdrop').classList.remove('show'); }
+function toggleSidebarCollapse() { sidebarCollapsed = !sidebarCollapsed; localStorage.setItem(SIDEBAR_KEY, sidebarCollapsed ? '1' : '0'); applySidebarCollapsed(); }
 function applySidebarCollapsed() {
   document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
   const btn = document.getElementById('sidebarCollapseBtn');
@@ -828,9 +889,7 @@ function goToPage(page) {
 function selectSheet(name) {
   updateSidebarActive({ sheet: name });
   document.getElementById('topbarTitle').textContent = name;
-  document.getElementById('topbarSubtitle').textContent = name === 'Pekerjaan'
-    ? 'Daftar pekerjaan dan status penyelesaian'
-    : 'Dokumen dan checklist USTEK';
+  document.getElementById('topbarSubtitle').textContent = name === 'Pekerjaan' ? 'Daftar pekerjaan dan status penyelesaian' : 'Dokumen dan checklist USTEK';
   currentPage = 'table';
   document.getElementById('page-dashboard').style.display = 'none';
   document.getElementById('page-table').style.display = '';
@@ -839,20 +898,10 @@ function selectSheet(name) {
   closeSidebarMobile();
 }
 
-// ── Role / akun di sidebar ─────────────────────────────────
-function hashColor(str) {
-  let hash = 0;
-  const s = String(str || '');
-  for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
+function hashColor(str) { let hash = 0; const s = String(str || ''); for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash); return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]; }
 function renderSidebarAccount() {
   const el  = document.getElementById('sidebarAccount');
-  const lbl = isAdmin
-    ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Admin</span>'
-    : '<span class="role-badge user"><i class="bi bi-eye"></i> User</span>';
-  // Warna avatar dibedakan per akun/user supaya mudah dibedakan pada multiuser
+  const lbl = isAdmin ? '<span class="role-badge admin"><i class="bi bi-shield-check"></i> Admin</span>' : '<span class="role-badge user"><i class="bi bi-eye"></i> User</span>';
   const accentColor = hashColor(loggedUsername || currentRole || 'user');
   el.innerHTML = `
     <div class="account-menu">
@@ -867,12 +916,10 @@ function renderSidebarAccount() {
     </div>
   `;
 }
-function toggleAccountMenu() {
-  document.getElementById('sidebarAccount').classList.toggle('open');
-}
+function toggleAccountMenu() { document.getElementById('sidebarAccount').classList.toggle('open'); }
 
 function applyColumnLayout() {
-  const aw = [4,5,20,6,13,9,9,9,12,13];
+  const aw = [4,6,18,6,13,9,9,11,15,9]; // Disesuaikan lebar handle drag & drop
   const gw = [5,26,7,15,13,10,10,14];
   document.getElementById('colSelect').style.display = isAdmin ? '' : 'none';
   document.getElementById('thSelect').style.display  = isAdmin ? '' : 'none';
@@ -890,320 +937,266 @@ function applyColumnLayout() {
 // ── Ubah Kredensial ─────────────────────────────────────────
 function openChangeCredModal() {
   document.getElementById('credForm').reset();
-  document.getElementById('credErr').style.display = 'none';
-  document.getElementById('credOk').style.display  = 'none';
+  document.getElementById('credErr').style.display = 'none'; document.getElementById('credOk').style.display  = 'none';
   document.getElementById('cred_role').value = currentRole || 'admin';
   document.getElementById('sidebarAccount')?.classList.remove('open');
   credModal.show();
 }
-
 async function submitChangeCred(e) {
   e.preventDefault();
-  const btn = document.getElementById('btnCredSubmit');
-  const errEl = document.getElementById('credErr');
-  const okEl  = document.getElementById('credOk');
-  errEl.style.display = 'none'; okEl.style.display = 'none';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
-
+  const btn = document.getElementById('btnCredSubmit'); const errEl = document.getElementById('credErr'); const okEl  = document.getElementById('credOk');
+  errEl.style.display = 'none'; okEl.style.display = 'none'; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
   try {
-    const r = await api('changeCredentials', {
-      role: document.getElementById('cred_role').value,
-      currentUsername: document.getElementById('cred_curUser').value,
-      currentPassword: document.getElementById('cred_curPass').value,
-      newUsername: document.getElementById('cred_newUser').value,
-      newPassword: document.getElementById('cred_newPass').value
-    });
-    if (r && r.success) {
-      okEl.textContent = 'Berhasil diubah. Gunakan kredensial baru saat login berikutnya.';
-      okEl.style.display = 'block';
-      document.getElementById('credForm').reset();
-    } else {
-      errEl.textContent = (r && r.message) || 'Gagal.';
-      errEl.style.display = 'block';
-    }
+    const r = await api('changeCredentials', { role: document.getElementById('cred_role').value, currentUsername: document.getElementById('cred_curUser').value, currentPassword: document.getElementById('cred_curPass').value, newUsername: document.getElementById('cred_newUser').value, newPassword: document.getElementById('cred_newPass').value });
+    if (r && r.success) { okEl.textContent = 'Berhasil diubah. Gunakan kredensial baru saat login berikutnya.'; okEl.style.display = 'block'; document.getElementById('credForm').reset(); }
+    else { errEl.textContent = (r && r.message) || 'Gagal.'; errEl.style.display = 'block'; }
   } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="bi bi-save me-1"></i> Simpan';
+  btn.disabled = false; btn.innerHTML = '<i class="bi bi-save me-1"></i> Simpan';
 }
 
-// ── Global loading overlay ──────────────────────────────────
+// ── Helpers ──────────────────────────────────
 let globalLoadingCount = 0;
-function showGlobalLoading(text) {
-  globalLoadingCount++;
-  document.getElementById('globalLoadingText').textContent = text || 'Memproses...';
-  document.getElementById('globalLoadingOverlay').classList.add('active');
-}
-function hideGlobalLoading() {
-  globalLoadingCount = Math.max(0, globalLoadingCount - 1);
-  if (globalLoadingCount === 0) {
-    document.getElementById('globalLoadingOverlay').classList.remove('active');
-  }
-}
+function showGlobalLoading(text) { globalLoadingCount++; document.getElementById('globalLoadingText').textContent = text || 'Memproses...'; document.getElementById('globalLoadingOverlay').classList.add('active'); }
+function hideGlobalLoading() { globalLoadingCount = Math.max(0, globalLoadingCount - 1); if (globalLoadingCount === 0) { document.getElementById('globalLoadingOverlay').classList.remove('active'); } }
 
-// ── Toast & Confirm (pengganti alert()/confirm() bawaan) ────
 function showToast(message, type) {
-  type = type || 'info';
-  const icon = type === 'success' ? 'bi-check-circle-fill' : type === 'danger' ? 'bi-x-circle-fill' : 'bi-info-circle-fill';
-  const container = document.getElementById('toastContainer');
-  const id = 'toast-' + Date.now() + '-' + Math.floor(Math.random()*1000);
-  const div = document.createElement('div');
-  div.className = 'app-toast app-toast-' + type;
-  div.id = id;
+  type = type || 'info'; const icon = type === 'success' ? 'bi-check-circle-fill' : type === 'danger' ? 'bi-x-circle-fill' : 'bi-info-circle-fill';
+  const container = document.getElementById('toastContainer'); const id = 'toast-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+  const div = document.createElement('div'); div.className = 'app-toast app-toast-' + type; div.id = id;
   div.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span><button type="button" class="app-toast-close" onclick="document.getElementById('${id}')?.remove()"><i class="bi bi-x-lg"></i></button>`;
-  container.appendChild(div);
-  setTimeout(() => {
-    const el = document.getElementById(id);
-    if (el) { el.classList.add('app-toast-out'); setTimeout(() => el.remove(), 260); }
-  }, 4200);
+  container.appendChild(div); setTimeout(() => { const el = document.getElementById(id); if (el) { el.classList.add('app-toast-out'); setTimeout(() => el.remove(), 260); } }, 4200);
 }
 
 function showConfirm(message, opts) {
-  opts = opts || {};
-  document.getElementById('confirmModalTitle').innerHTML = '<i class="bi bi-question-circle me-2 text-primary"></i>' + (opts.title || 'Konfirmasi');
-  document.getElementById('confirmModalBody').textContent = message;
-  const btnOk = document.getElementById('btnConfirmOk');
-  btnOk.textContent = opts.okText || 'Ya, Lanjutkan';
+  opts = opts || {}; document.getElementById('confirmModalTitle').innerHTML = '<i class="bi bi-question-circle me-2 text-primary"></i>' + (opts.title || 'Konfirmasi');
+  document.getElementById('confirmModalBody').textContent = message; const btnOk = document.getElementById('btnConfirmOk'); btnOk.textContent = opts.okText || 'Ya, Lanjutkan';
   btnOk.className = 'btn ' + (opts.danger ? 'btn-danger' : 'btn-primary');
-  const contentEl = document.querySelector('#confirmModal .modal-content');
-  contentEl.classList.remove('is-danger','is-primary');
-  contentEl.classList.add(opts.danger ? 'is-danger' : 'is-primary');
-  return new Promise((resolve) => {
-    confirmResolver = resolve;
-    confirmModal.show();
-  });
+  const contentEl = document.querySelector('#confirmModal .modal-content'); contentEl.classList.remove('is-danger','is-primary'); contentEl.classList.add(opts.danger ? 'is-danger' : 'is-primary');
+  return new Promise((resolve) => { confirmResolver = resolve; confirmModal.show(); });
 }
 
-// ── Loading / empty ─────────────────────────────────────────
 function showLoading() {
-  document.getElementById('tableBody').innerHTML =
-    '<tr><td colspan="10" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fw-semibold mb-0">Memuat data...</p></td></tr>';
+  document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fw-semibold mb-0">Memuat data...</p></td></tr>';
 }
 function showError(msg) {
-  document.getElementById('tableBody').innerHTML =
-    `<tr><td colspan="10" class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0 fw-semibold">${msg}</p></td></tr>`;
+  document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="text-center py-5 text-danger"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0 fw-semibold">${msg}</p></td></tr>`;
 }
 
 // ── Sheet / tabel ────────────────────────────────────────────
 async function changeSheet(name) {
-  // simpan posisi scroll sheet lama sebelum pindah, supaya scroll tiap tab independen
-  const shell = document.getElementById('tableShell');
-  scrollPositions[activeSheet] = shell.scrollTop;
-
-  activeSheet = name;
-  document.getElementById('searchInput').value = '';
-  document.getElementById('btnClearSearch').style.display = 'none';
+  const shell = document.getElementById('tableShell'); scrollPositions[activeSheet] = shell.scrollTop; activeSheet = name;
+  document.getElementById('searchInput').value = ''; document.getElementById('btnClearSearch').style.display = 'none';
   clearSelection(); sortState = { column: null, direction: 'asc' }; updateSortIcons();
-
   if (cache[name]) { renderTable(cache[name]); } else { showLoading(); }
   restoreScrollPosition();
-
   try {
     const d = await api('getData', { sheet: name, token: authToken });
-    cache[name] = d;
-    if (activeSheet === name) renderTable(d);
-    renderDashboard();
+    cache[name] = d; if (activeSheet === name) renderTable(d); renderDashboard();
   } catch (err) { showError(err.message); }
 }
-function restoreScrollPosition() {
-  const shell = document.getElementById('tableShell');
-  requestAnimationFrame(() => { shell.scrollTop = scrollPositions[activeSheet] || 0; });
-}
+function restoreScrollPosition() { requestAnimationFrame(() => { document.getElementById('tableShell').scrollTop = scrollPositions[activeSheet] || 0; }); }
 
 // ── Avatar inisial PIC ───────────────────────────────────────
 const AVATAR_COLORS = ['#2563eb','#7c3aed','#16a34a','#d97706','#dc2626','#0891b2','#db2777','#4f46e5'];
 function renderPicAvatars(picStr) {
-  if (!picStr) return '<span class="text-muted">-</span>';
-  const names = String(picStr).split(',').map(s => s.trim()).filter(Boolean);
-  if (!names.length) return '<span class="text-muted">-</span>';
-  // Maksimal 3 avatar per baris, sisanya di-wrap ke baris berikutnya
-  const rows = [];
+  if (!picStr) return '<span class="text-muted">-</span>'; const names = String(picStr).split(',').map(s => s.trim()).filter(Boolean);
+  if (!names.length) return '<span class="text-muted">-</span>'; const rows = [];
   for (let i = 0; i < names.length; i += 3) rows.push(names.slice(i, i + 3));
   const rowsHtml = rows.map(group => {
     const avatars = group.map(n => {
-      const parts = n.split(/\s+/).filter(Boolean);
-      const initials = parts.length >= 2
-        ? (parts[0][0] + parts[1][0]).toUpperCase()
-        : n.substring(0,2).toUpperCase();
+      const parts = n.split(/\s+/).filter(Boolean); const initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : n.substring(0,2).toUpperCase();
       const color = hashColor(n);
       return `<span class="pic-avatar" style="background:${color}" title="${n}" data-bs-toggle="tooltip">${initials}</span>`;
-    }).join('');
-    return `<span class="pic-avatar-group">${avatars}</span>`;
-  }).join('');
-  return `<div class="pic-avatars">${rowsHtml}</div>`;
+    }).join(''); return `<span class="pic-avatar-group">${avatars}</span>`;
+  }).join(''); return `<div class="pic-avatars">${rowsHtml}</div>`;
 }
 
 // ── Inline edit: Status & Checklist ──────────────────────────
-function closeInlineEditPop() {
-  document.querySelectorAll('.inline-edit-pop').forEach(el => el.remove());
-}
+function closeInlineEditPop() { document.querySelectorAll('.inline-edit-pop').forEach(el => el.remove()); }
 function positionPop(pop, anchor) {
-  const r = anchor.getBoundingClientRect();
-  document.body.appendChild(pop);
-  pop.style.position = 'absolute';
-  pop.style.top  = (window.scrollY + r.bottom + 6) + 'px';
-  let left = window.scrollX + r.left;
-  const maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 10;
-  if (left > maxLeft) left = maxLeft;
-  pop.style.left = Math.max(10, left) + 'px';
+  const r = anchor.getBoundingClientRect(); document.body.appendChild(pop); pop.style.position = 'absolute'; pop.style.top  = (window.scrollY + r.bottom + 6) + 'px';
+  let left = window.scrollX + r.left; const maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 10;
+  if (left > maxLeft) left = maxLeft; pop.style.left = Math.max(10, left) + 'px';
 }
-
-// Baris-baris yang ikut diedit bersamaan: jika baris yang diklik termasuk dalam
-// seleksi (dan ada lebih dari 1 data terpilih), maka semua data terpilih ikut berubah.
-function targetRowsFor(no) {
-  const noStr = String(no);
-  if (selectedRows.size > 1 && selectedRows.has(noStr)) return [...selectedRows];
-  return [noStr];
-}
+function targetRowsFor(no) { const noStr = String(no); if (selectedRows.size > 1 && selectedRows.has(noStr)) return [...selectedRows]; return [noStr]; }
 
 function openStatusEditor(ev, no) {
-  ev.stopPropagation();
-  if (!isAdmin) return;
-  closeInlineEditPop();
-  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
-  if (!row) return;
-  const cur = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
-  const targets = targetRowsFor(no);
+  ev.stopPropagation(); if (!isAdmin) return; closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no)); if (!row) return;
+  const cur = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing'; const targets = targetRowsFor(no);
   const hint = targets.length > 1 ? `<div class="pop-hint">${targets.length} data terpilih</div>` : '';
-  const pop = document.createElement('div');
-  pop.className = 'inline-edit-pop';
-  pop.innerHTML = `
-    ${hint}
-    <button type="button" class="${cur==='Ongoing'?'active':''}" onclick="applyInlineStatus('${no}','Ongoing')"><i class="bi bi-arrow-repeat text-warning"></i> Ongoing</button>
-    <button type="button" class="${cur==='Done'?'active':''}" onclick="applyInlineStatus('${no}','Done')"><i class="bi bi-check-circle text-success"></i> Done</button>
-  `;
+  const pop = document.createElement('div'); pop.className = 'inline-edit-pop';
+  pop.innerHTML = `${hint}<button type="button" class="${cur==='Ongoing'?'active':''}" onclick="applyInlineStatus('${no}','Ongoing')"><i class="bi bi-arrow-repeat text-warning"></i> Ongoing</button><button type="button" class="${cur==='Done'?'active':''}" onclick="applyInlineStatus('${no}','Done')"><i class="bi bi-check-circle text-success"></i> Done</button>`;
   positionPop(pop, ev.currentTarget);
 }
 
 function openChecklistEditor(ev, no, field) {
-  ev.stopPropagation();
-  if (!isAdmin) return;
-  closeInlineEditPop();
-  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no));
-  if (!row) return;
-  const idx = field === 'collected' ? 6 : 7;
-  const cur = row[idx] === true || row[idx] === 'TRUE';
-  const label = field === 'collected' ? 'Collected' : 'Uploaded to NAS';
-  const targets = targetRowsFor(no);
+  ev.stopPropagation(); if (!isAdmin) return; closeInlineEditPop();
+  const row = (cache[activeSheet]||[]).find(r => String(r[0]) === String(no)); if (!row) return;
+  const idx = field === 'collected' ? 6 : 7; const cur = row[idx] === true || row[idx] === 'TRUE';
+  const label = field === 'collected' ? 'Collected' : 'Uploaded to NAS'; const targets = targetRowsFor(no);
   const hint = targets.length > 1 ? `<div class="pop-hint">${targets.length} data terpilih</div>` : '';
-  const pop = document.createElement('div');
-  pop.className = 'inline-edit-pop';
-  pop.innerHTML = `
-    ${hint}
-    <button type="button" class="${cur?'':'active'}" onclick="applyInlineChecklist('${no}','${field}',false)"><i class="bi bi-x-circle text-muted"></i> Belum ${label}</button>
-    <button type="button" class="${cur?'active':''}" onclick="applyInlineChecklist('${no}','${field}',true)"><i class="bi bi-check-circle text-success"></i> ${label}</button>
-  `;
+  const pop = document.createElement('div'); pop.className = 'inline-edit-pop';
+  pop.innerHTML = `${hint}<button type="button" class="${cur?'':'active'}" onclick="applyInlineChecklist('${no}','${field}',false)"><i class="bi bi-x-circle text-muted"></i> Belum ${label}</button><button type="button" class="${cur?'active':''}" onclick="applyInlineChecklist('${no}','${field}',true)"><i class="bi bi-check-circle text-success"></i> ${label}</button>`;
   positionPop(pop, ev.currentTarget);
 }
 
 async function applyInlineStatus(no, statusValue) {
-  closeInlineEditPop();
-  const targets = targetRowsFor(no);
-  const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
-  if (!rows.length) return;
-  showGlobalLoading(rows.length > 1 ? `Menyimpan status untuk ${rows.length} data...` : 'Menyimpan status...');
+  closeInlineEditPop(); const targets = targetRowsFor(no); const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
+  if (!rows.length) return; showGlobalLoading(rows.length > 1 ? `Menyimpan status untuk ${rows.length} data...` : 'Menyimpan status...');
   try {
     let d;
-    if (rows.length > 1) {
-      d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue, collectedValue: null, uploadedValue: null });
-    } else {
-      const row = rows[0];
-      d = await api('saveData', {
-        sheetName: activeSheet, token: authToken,
-        no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
-        statusPekerjaan: statusValue,
-        collected: row[6]===true||row[6]==='TRUE',
-        uploaded:  row[7]===true||row[7]==='TRUE',
-        keterangan: row[8]||''
-      });
-    }
-    cache[activeSheet] = d; renderTable(d); renderDashboard();
-    showToast('Status berhasil diperbarui.', 'success');
-  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
-  hideGlobalLoading();
+    if (rows.length > 1) { d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue, collectedValue: null, uploadedValue: null }); }
+    else { const row = rows[0]; d = await api('saveData', { sheetName: activeSheet, token: authToken, no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4], statusPekerjaan: statusValue, collected: row[6]===true||row[6]==='TRUE', uploaded:  row[7]===true||row[7]==='TRUE', keterangan: row[8]||'' }); }
+    cache[activeSheet] = d; renderTable(d); renderDashboard(); showToast('Status berhasil diperbarui.', 'success');
+  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading();
 }
 
 async function applyInlineChecklist(no, field, value) {
-  closeInlineEditPop();
-  const targets = targetRowsFor(no);
-  const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
-  if (!rows.length) return;
-  showGlobalLoading(rows.length > 1 ? `Menyimpan checklist untuk ${rows.length} data...` : 'Menyimpan checklist...');
+  closeInlineEditPop(); const targets = targetRowsFor(no); const rows = targets.map(n => (cache[activeSheet]||[]).find(r => String(r[0]) === String(n))).filter(Boolean);
+  if (!rows.length) return; showGlobalLoading(rows.length > 1 ? `Menyimpan checklist untuk ${rows.length} data...` : 'Menyimpan checklist...');
   try {
     let d;
-    if (rows.length > 1) {
-      d = await api('batchUpdate', {
-        sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken,
-        statusValue: null,
-        collectedValue: field === 'collected' ? value : null,
-        uploadedValue:  field === 'uploaded'  ? value : null
-      });
-    } else {
-      const row = rows[0];
-      d = await api('saveData', {
-        sheetName: activeSheet, token: authToken,
-        no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4],
-        statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing',
-        collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'),
-        uploaded:  field==='uploaded'  ? value : (row[7]===true||row[7]==='TRUE'),
-        keterangan: row[8]||''
-      });
+    if (rows.length > 1) { d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue: null, collectedValue: field === 'collected' ? value : null, uploadedValue:  field === 'uploaded'  ? value : null }); }
+    else { const row = rows[0]; d = await api('saveData', { sheetName: activeSheet, token: authToken, no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4], statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing', collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'), uploaded:  field==='uploaded'  ? value : (row[7]===true||row[7]==='TRUE'), keterangan: row[8]||'' }); }
+    cache[activeSheet] = d; renderTable(d); renderDashboard(); showToast('Checklist berhasil diperbarui.', 'success');
+  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading();
+}
+
+// ── SortableJS 1C ─────────────────────────────────────────────
+function initDragAndDrop() {
+  const tbody = document.getElementById('tableBody');
+  if (tableSortable) { tableSortable.destroy(); }
+  if (!isAdmin) return;
+
+  tableSortable = new Sortable(tbody, {
+    handle: '.drag-handle',
+    animation: 200,
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    onEnd: async function(evt) {
+      if (evt.oldIndex === evt.newIndex) return;
+      
+      const rowEl = evt.item;
+      const fromNo = rowEl.dataset.no;
+      const toNo = evt.newIndex + 1; // Karena baris diurutkan dari atas
+
+      showGlobalLoading('Memindahkan urutan data...');
+      try {
+        const d = await api('reorder', { sheetName: activeSheet, fromNo, toNo, token: authToken });
+        cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard();
+        showToast('Urutan data berhasil diubah.', 'success');
+      } catch (err) {
+        showToast('Gagal: ' + err.message, 'danger');
+        renderTable(cache[activeSheet]); // Reset visual ke kondisi semula bila error
+      }
+      hideGlobalLoading();
     }
-    cache[activeSheet] = d; renderTable(d); renderDashboard();
-    showToast('Checklist berhasil diperbarui.', 'success');
-  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
-  hideGlobalLoading();
+  });
+}
+
+function checkSortableState() {
+  if (!tableSortable) return;
+  const q = document.getElementById('searchInput').value.trim();
+  const isDefaultSort = sortState.column === null || (sortState.column === 0 && sortState.direction === 'asc');
+  
+  if (q || !isDefaultSort) {
+    tableSortable.option("disabled", true);
+    document.querySelectorAll('.drag-handle').forEach(el => {
+      el.style.opacity = '0.3';
+      el.style.cursor = 'not-allowed';
+      el.title = 'Nonaktif saat filter pencarian atau urutan kolom lain aktif.';
+    });
+  } else {
+    tableSortable.option("disabled", false);
+    document.querySelectorAll('.drag-handle').forEach(el => {
+      el.style.opacity = '1';
+      el.style.cursor = 'grab';
+      el.title = 'Tarik untuk mengubah urutan data';
+    });
+  }
 }
 
 // ── Render tabel ──────────────────────────────────────────────
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
+  // 2B: Visual SVG Menarik untuk State Kosong
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i><p class="mb-0 fw-semibold">Belum ada data</p></td></tr>';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" class="text-center py-5" style="border:none;">
+          <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="text-muted mb-3" style="opacity:0.35;">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="9" x2="15" y2="9"></line>
+            <line x1="9" y1="13" x2="15" y2="13"></line>
+            <line x1="9" y1="17" x2="12" y2="17"></line>
+          </svg>
+          <h5 class="text-muted fw-bold">Belum Ada Data</h5>
+          <p class="text-muted small mb-0">Tekan tombol tambah ( + ) untuk memasukkan data baru ke dalam proyek.</p>
+        </td>
+      </tr>`;
     document.getElementById('filteredCount').style.display = 'none';
+    if(tableSortable) tableSortable.destroy();
     return;
   }
+  
   tbody.innerHTML = '';
   data.forEach(row => {
     const isDone = row[5] === 'Done' || row[5] === 'done';
     const noStr  = String(row[0]);
     const editableCls = isAdmin ? 'editable' : '';
     const statusHandler = isAdmin ? `onclick="openStatusEditor(event,'${noStr}')"` : '';
-    const pill   = isDone
-      ? `<span class="status-pill done ${editableCls}" ${statusHandler}><i class="bi bi-check-circle"></i>Done</span>`
-      : `<span class="status-pill ongoing ${editableCls}" ${statusHandler}><i class="bi bi-arrow-repeat"></i>Ongoing</span>`;
+    const pill   = isDone ? `<span class="status-pill done ${editableCls}" ${statusHandler}><i class="bi bi-check-circle"></i>Done</span>` : `<span class="status-pill ongoing ${editableCls}" ${statusHandler}><i class="bi bi-arrow-repeat"></i>Ongoing</span>`;
     const isColl = row[6] === true || row[6] === 'TRUE';
     const isUp   = row[7] === true || row[7] === 'TRUE';
     const collHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','collected')"` : '';
     const upHandler   = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','uploaded')"` : '';
-    const ic     = isColl ? `<i class="bi bi-file-earmark-check-fill text-success ${editableCls}" ${collHandler} title="Collected"></i>`
-                          : `<i class="bi bi-file-earmark text-muted ${editableCls}" ${collHandler} title="Belum collected"></i>`;
-    const iu     = isUp   ? `<i class="bi bi-cloud-check-fill text-primary ${editableCls}" ${upHandler} title="Uploaded to NAS"></i>`
-                          : `<i class="bi bi-cloud-slash text-muted ${editableCls}" ${upHandler} title="Belum diupload"></i>`;
-    const selCell = isAdmin ? `<td class="text-center"><input type="checkbox" class="row-select-checkbox" data-no="${noStr}" ${selectedRows.has(noStr)?'checked':''} onchange="toggleRowSelect('${noStr}',this.checked)"></td>` : '';
-    const aksiCell = isAdmin ? `<td class="text-center"><div class="d-flex gap-1 justify-content-center"><button type="button" class="btn-edit-row" onclick='editData(${JSON.stringify(row)})' title="Edit"><i class="bi bi-pencil-square"></i></button><button type="button" class="btn-edit-row" onclick="openMoveModal('${noStr}')" title="Ubah urutan"><i class="bi bi-arrows-move"></i></button></div></td>` : '';
+    const ic     = isColl ? `<i class="bi bi-file-earmark-check-fill text-success ${editableCls}" ${collHandler} title="Collected"></i>` : `<i class="bi bi-file-earmark text-muted ${editableCls}" ${collHandler} title="Belum collected"></i>`;
+    const iu     = isUp   ? `<i class="bi bi-cloud-check-fill text-primary ${editableCls}" ${upHandler} title="Uploaded to NAS"></i>` : `<i class="bi bi-cloud-slash text-muted ${editableCls}" ${upHandler} title="Belum diupload"></i>`;
+    
+    // Setup kolom 2A dengan "data-label" untuk Cards Table di HP
+    const dragHandle = isAdmin ? `<span class="drag-handle text-muted me-1"><i class="bi bi-grip-vertical"></i></span>` : '';
+    const selCell = isAdmin ? `<td data-label="Pilih" class="text-center"><input type="checkbox" class="row-select-checkbox" data-no="${noStr}" ${selectedRows.has(noStr)?'checked':''} onchange="toggleRowSelect('${noStr}',this.checked)"></td>` : '';
+    const aksiCell = isAdmin ? `<td data-label="Aksi" class="text-center"><div class="d-flex gap-1 justify-content-center"><button type="button" class="btn-edit-row" onclick='editData(${JSON.stringify(row)})' title="Edit"><i class="bi bi-pencil-square"></i></button></div></td>` : '';
+    
     const tr = document.createElement('tr');
-    tr.innerHTML = `${selCell}<td class="text-center fw-bold">${row[0]}</td><td class="fw-semibold">${row[1]}</td><td class="text-center">${row[2]}</td><td>${row[3]}</td><td>${renderPicAvatars(row[4])}</td><td class="text-center">${pill}</td><td><div class="checklist-icons">${ic}${iu}</div></td><td class="text-muted">${row[8]||'-'}</td>${aksiCell}`;
+    tr.dataset.no = noStr; // Untuk SortableJS
+    tr.innerHTML = `
+      ${selCell}
+      <td data-label="No" class="text-center fw-bold align-middle d-flex align-items-center justify-content-md-center justify-content-end">${dragHandle}<span>${row[0]}</span></td>
+      <td data-label="Judul Pekerjaan" class="fw-semibold">${row[1]}</td>
+      <td data-label="Tahun" class="text-center">${row[2]}</td>
+      <td data-label="Jenis Pekerjaan">${row[3]}</td>
+      <td data-label="PIC">${renderPicAvatars(row[4])}</td>
+      <td data-label="Status" class="text-center">${pill}</td>
+      <td data-label="Checklist"><div class="checklist-icons">${ic}${iu}</div></td>
+      <td data-label="Keterangan" class="text-muted">${row[8]||'-'}</td>
+      ${aksiCell}
+    `;
     const searchText = [row[0], row[1], row[2], row[3], row[4], isDone ? 'Done' : 'Ongoing', row[8]].filter(v => v !== undefined && v !== null).join(' ').toLowerCase();
     tr.dataset.search = searchText;
     tbody.appendChild(tr);
   });
-  if (isAdmin) updateSelectAllCheckbox();
+  
+  if (isAdmin) {
+    updateSelectAllCheckbox();
+    initDragAndDrop();
+  }
+  
   filterTable();
+  initTooltips(); // 1B: Re-inisialisasi Bootstrap Tooltip setelah render!
 }
 
 // ── Dashboard ──────────────────────────────────────────────
 function renderDashboard() {
   const sheetSel = document.getElementById('dashSheetFilter').value;
   const yearSel  = document.getElementById('dashYearFilter');
-
   let baseRows = sheetSel === 'all' ? [...(cache.Pekerjaan||[]), ...(cache.USTEK||[])] : (cache[sheetSel] || []);
 
   const years = [...new Set(baseRows.map(r => String(r[2])).filter(Boolean))].sort((a,b) => b - a);
   const keepYear = yearSel.value;
   yearSel.innerHTML = '<option value="all">Semua Tahun</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
   yearSel.value = years.includes(keepYear) ? keepYear : 'all';
-
   let rows = baseRows;
   if (yearSel.value !== 'all') rows = rows.filter(r => String(r[2]) === yearSel.value);
 
@@ -1222,21 +1215,17 @@ function renderDashboard() {
   const donePct = total ? Math.round((done / total) * 100) : 0;
   const collPct = total ? Math.round((collected / total) * 100) : 0;
   const upPct   = total ? Math.round((uploaded / total) * 100) : 0;
-  document.getElementById('pbDone').style.width = donePct + '%';
-  document.getElementById('pbDoneText').textContent = donePct + '%';
-  document.getElementById('pbCollected').style.width = collPct + '%';
-  document.getElementById('pbCollectedText').textContent = collPct + '%';
-  document.getElementById('pbUploaded').style.width = upPct + '%';
-  document.getElementById('pbUploadedText').textContent = upPct + '%';
+  document.getElementById('pbDone').style.width = donePct + '%'; document.getElementById('pbDoneText').textContent = donePct + '%';
+  document.getElementById('pbCollected').style.width = collPct + '%'; document.getElementById('pbCollectedText').textContent = collPct + '%';
+  document.getElementById('pbUploaded').style.width = upPct + '%'; document.getElementById('pbUploadedText').textContent = upPct + '%';
 
   const counts = {};
   baseRows.forEach(r => { const y = String(r[2] || '-'); counts[y] = (counts[y] || 0) + 1; });
   const yearsSorted = Object.keys(counts).sort((a,b) => b - a);
   const maxCount = Math.max(1, ...Object.values(counts));
   const yb = document.getElementById('yearBreakdown');
-  if (!yearsSorted.length) {
-    yb.innerHTML = '<p class="text-muted text-center mb-0">Belum ada data</p>';
-  } else {
+  if (!yearsSorted.length) { yb.innerHTML = '<p class="text-muted text-center mb-0">Belum ada data</p>'; }
+  else {
     yb.innerHTML = yearsSorted.map(y => `
       <div class="year-row">
         <span class="year-label">${y}</span>
@@ -1267,46 +1256,35 @@ function updateSortIcons() {
   document.querySelectorAll('.sort-icon').forEach(icon => {
     const c = Number(icon.getAttribute('data-col-icon'));
     icon.classList.remove('active','bi-arrow-down-up','bi-sort-up','bi-sort-down');
-    if (sortState.column === c) {
-      icon.classList.add('active', sortState.direction === 'asc' ? 'bi-sort-up' : 'bi-sort-down');
-    } else { icon.classList.add('bi-arrow-down-up'); }
+    if (sortState.column === c) { icon.classList.add('active', sortState.direction === 'asc' ? 'bi-sort-up' : 'bi-sort-down'); }
+    else { icon.classList.add('bi-arrow-down-up'); }
   });
 }
 
 // ── Floating panel: Tambah Data ──────────────────────────────
-function openAddPanel() {
-  if (!isAdmin) return;
-  document.getElementById('addPanel').classList.add('open');
-  document.getElementById('addPanelBackdrop').classList.add('show');
-}
-function closeAddPanel() {
-  document.getElementById('addPanel').classList.remove('open');
-  document.getElementById('addPanelBackdrop').classList.remove('show');
-  resetAddForm();
-}
-function resetAddForm() {
-  document.getElementById('projectForm').reset();
-  document.getElementById('tahun').value = new Date().getFullYear();
-}
+function openAddPanel() { if (!isAdmin) return; document.getElementById('addPanel').classList.add('open'); document.getElementById('addPanelBackdrop').classList.add('show'); }
+function closeAddPanel() { document.getElementById('addPanel').classList.remove('open'); document.getElementById('addPanelBackdrop').classList.remove('show'); resetAddForm(); }
+function resetAddForm() { document.getElementById('projectForm').reset(); document.getElementById('tahun').value = new Date().getFullYear(); }
 
 async function submitData(e) {
   e.preventDefault(); if (!isAdmin) return;
   const btn = document.getElementById('btnSubmit');
+  
+  // Bug fix Tambah Data: Tutup modal lebih dulu
+  closeAddPanel();
+  
   btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
   showGlobalLoading('Menyimpan data...');
   try {
     const d = await api('saveData', {
       sheetName: activeSheet, no: '', token: authToken,
-      judul: document.getElementById('judul').value,
-      tahun: document.getElementById('tahun').value,
-      jenis: document.getElementById('jenis').value,
-      pic:   document.getElementById('pic').value,
+      judul: document.getElementById('judul').value, tahun: document.getElementById('tahun').value,
+      jenis: document.getElementById('jenis').value, pic:   document.getElementById('pic').value,
       statusPekerjaan: document.getElementById('statusPekerjaan').value,
-      collected: document.getElementById('collected').checked,
-      uploaded:  document.getElementById('uploaded').checked,
+      collected: document.getElementById('collected').checked, uploaded:  document.getElementById('uploaded').checked,
       keterangan: document.getElementById('keterangan').value
     });
-    cache[activeSheet] = d; renderTable(d); renderDashboard(); closeAddPanel();
+    cache[activeSheet] = d; renderTable(d); renderDashboard();
     showToast('Data berhasil ditambahkan.', 'success');
   } catch (err) { showToast('Gagal menyimpan: ' + err.message, 'danger'); }
   hideGlobalLoading();
@@ -1317,12 +1295,12 @@ async function submitData(e) {
 function editData(row) {
   if (!isAdmin) return;
   document.getElementById('editModalNo').textContent = '(No. ' + row[0] + ')';
-  document.getElementById('edit_no').value       = row[0];
-  document.getElementById('edit_judul').value    = row[1];
-  document.getElementById('edit_tahun').value    = row[2];
-  document.getElementById('edit_jenis').value    = row[3];
-  document.getElementById('edit_pic').value      = row[4];
-  document.getElementById('edit_status').value   = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
+  document.getElementById('edit_no').value        = row[0];
+  document.getElementById('edit_judul').value     = row[1];
+  document.getElementById('edit_tahun').value     = row[2];
+  document.getElementById('edit_jenis').value     = row[3];
+  document.getElementById('edit_pic').value       = row[4];
+  document.getElementById('edit_status').value    = (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing';
   document.getElementById('edit_collected').checked = (row[6]===true||row[6]==='TRUE');
   document.getElementById('edit_uploaded').checked  = (row[7]===true||row[7]==='TRUE');
   document.getElementById('edit_keterangan').value  = row[8]||'';
@@ -1334,18 +1312,13 @@ function editData(row) {
 async function submitEditData(e) {
   e.preventDefault(); if (!isAdmin) return;
   const payload = {
-    sheetName: activeSheet, token: authToken,
-    no:   document.getElementById('edit_no').value,
-    judul:document.getElementById('edit_judul').value,
-    tahun:document.getElementById('edit_tahun').value,
-    jenis:document.getElementById('edit_jenis').value,
-    pic:  document.getElementById('edit_pic').value,
+    sheetName: activeSheet, token: authToken, no: document.getElementById('edit_no').value,
+    judul:document.getElementById('edit_judul').value, tahun:document.getElementById('edit_tahun').value,
+    jenis:document.getElementById('edit_jenis').value, pic: document.getElementById('edit_pic').value,
     statusPekerjaan: document.getElementById('edit_status').value,
-    collected: document.getElementById('edit_collected').checked,
-    uploaded:  document.getElementById('edit_uploaded').checked,
+    collected: document.getElementById('edit_collected').checked, uploaded: document.getElementById('edit_uploaded').checked,
     keterangan: document.getElementById('edit_keterangan').value
   };
-  // Tutup dialog dulu bersamaan dengan memulai animasi loading proses
   editModal.hide();
   showGlobalLoading('Menyimpan perubahan...');
   try {
@@ -1361,56 +1334,16 @@ async function deleteFromModal() {
   const no = document.getElementById('edit_no').value;
   const ok = await showConfirm('Hapus data No ' + no + '? Tindakan ini tidak dapat dibatalkan.', { title: 'Hapus Data', okText: 'Ya, Hapus', danger: true });
   if (!ok) return;
-
-  isDeletingRow = true;
-  // Tutup dulu dialog edit bersamaan dengan animasi menghapus data
-  editModal.hide();
-  showGlobalLoading('Menghapus data...');
+  isDeletingRow = true; editModal.hide(); showGlobalLoading('Menghapus data...');
   try {
     const d = await api('deleteData', { sheetName: activeSheet, no, token: authToken });
     cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard();
     showToast('Data berhasil dihapus.', 'success');
   } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
-  hideGlobalLoading();
-  isDeletingRow = false;
+  hideGlobalLoading(); isDeletingRow = false;
 }
 
-// ── Move modal ───────────────────────────────────────────────
-function openMoveModal(no) {
-  if (!isAdmin) return;
-  document.getElementById('moveForm').reset();
-  document.getElementById('moveErr').style.display = 'none';
-  document.getElementById('move_fromNo').value   = no;
-  document.getElementById('move_currentNo').value = no;
-  document.getElementById('moveLabel').textContent = 'No. ' + no;
-  const total = (cache[activeSheet]||[]).length;
-  const inp   = document.getElementById('move_toNo');
-  inp.max = total; inp.value = no;
-  moveModal.show();
-}
-
-async function submitMoveRow(e) {
-  e.preventDefault(); if (!isAdmin) return;
-  const fromNo = document.getElementById('move_fromNo').value;
-  const toNo   = document.getElementById('move_toNo').value;
-  const errEl  = document.getElementById('moveErr');
-  errEl.style.display = 'none';
-  if (!toNo || String(fromNo) === String(toNo)) {
-    errEl.textContent = 'Nomor tujuan wajib diisi dan harus berbeda.';
-    errEl.style.display = 'block'; return;
-  }
-  // Tutup dulu dialog bersamaan dengan animasi memindahkan data
-  moveModal.hide();
-  showGlobalLoading('Memindahkan urutan data...');
-  try {
-    const d = await api('reorder', { sheetName: activeSheet, fromNo, toNo, token: authToken });
-    cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard();
-    showToast('Urutan data berhasil diubah.', 'success');
-  } catch (err) { showToast('Gagal: ' + err.message, 'danger'); }
-  hideGlobalLoading();
-}
-
-// ── Search ───────────────────────────────────────────────────
+// ── Search & Filter ──────────────────────────────────────────
 function filterTable() {
   const q    = document.getElementById('searchInput').value.toLowerCase().trim();
   const rows = document.getElementById('tableBody').getElementsByTagName('tr');
@@ -1421,9 +1354,13 @@ function filterTable() {
     r.style.display = show ? '' : 'none';
     if (show) vis++;
   }
-  if (isAdmin) updateSelectAllCheckbox();
+  if (isAdmin) {
+    updateSelectAllCheckbox();
+    checkSortableState(); // Evaluasi Drag & Drop (1C)
+  }
   updateFilteredCountDisplay(vis, rows.length, q);
 }
+
 function clearSearch() {
   const inp = document.getElementById('searchInput');
   inp.value = ''; filterTable();
@@ -1431,36 +1368,26 @@ function clearSearch() {
   inp.focus();
 }
 
-// ── Jumlah data terfilter / terpilih (satu lokasi, tidak mengubah struktur header) ──
 function updateFilteredCountDisplay(vis, totalRows, q) {
-  const cEl = document.getElementById('filteredCount');
-  const n = selectedRows.size;
+  const cEl = document.getElementById('filteredCount'); const n = selectedRows.size;
   if (n > 0) {
-    cEl.style.display = '';
-    cEl.classList.add('selection-mode');
+    cEl.style.display = ''; cEl.classList.add('selection-mode');
     cEl.innerHTML = `${n} data dipilih <button type="button" class="clear-selection-btn" onclick="clearSelection()" title="Batalkan pilihan"><i class="bi bi-x-lg"></i></button>`;
   } else if (q) {
-    cEl.style.display = '';
-    cEl.classList.remove('selection-mode');
-    cEl.textContent = `Menampilkan ${vis} dari ${totalRows} data`;
+    cEl.style.display = ''; cEl.classList.remove('selection-mode'); cEl.textContent = `Menampilkan ${vis} dari ${totalRows} data`;
   } else {
-    cEl.style.display = 'none';
-    cEl.classList.remove('selection-mode');
+    cEl.style.display = 'none'; cEl.classList.remove('selection-mode');
   }
 }
 
-// ── Seleksi baris (batch inline edit, tanpa toolbar terpisah) ──────────────
-function toggleRowSelect(no, checked) {
-  if (checked) selectedRows.add(String(no)); else selectedRows.delete(String(no));
-  updateSelectAllCheckbox(); refreshSelectionDisplay();
-}
+// ── Seleksi baris ──────────────────────────────
+function toggleRowSelect(no, checked) { if (checked) selectedRows.add(String(no)); else selectedRows.delete(String(no)); updateSelectAllCheckbox(); refreshSelectionDisplay(); }
 function toggleSelectAll(cb) {
   const checked = cb.checked;
   document.querySelectorAll('#tableBody tr').forEach(tr => {
     if (tr.style.display === 'none') return;
     const c = tr.querySelector('.row-select-checkbox'); if (!c) return;
-    c.checked = checked;
-    if (checked) selectedRows.add(c.dataset.no); else selectedRows.delete(c.dataset.no);
+    c.checked = checked; if (checked) selectedRows.add(c.dataset.no); else selectedRows.delete(c.dataset.no);
   });
   refreshSelectionDisplay();
 }
@@ -1471,24 +1398,12 @@ function updateSelectAllCheckbox() {
   const n = rows.filter(r => r.querySelector('.row-select-checkbox').checked).length;
   all.checked = n === rows.length; all.indeterminate = n > 0 && n < rows.length;
 }
-function refreshSelectionDisplay() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-  const vis = [...rows].filter(r => r.style.display !== 'none').length;
-  updateFilteredCountDisplay(vis, rows.length, q);
-}
-function clearSelection() {
-  selectedRows.clear();
-  document.querySelectorAll('.row-select-checkbox').forEach(c => c.checked = false);
-  const all = document.getElementById('selectAllCheckbox');
-  if (all) { all.checked = false; all.indeterminate = false; }
-  refreshSelectionDisplay();
-}
+function refreshSelectionDisplay() { const q = document.getElementById('searchInput').value.toLowerCase().trim(); const rows = document.getElementById('tableBody').getElementsByTagName('tr'); const vis = [...rows].filter(r => r.style.display !== 'none').length; updateFilteredCountDisplay(vis, rows.length, q); }
+function clearSelection() { selectedRows.clear(); document.querySelectorAll('.row-select-checkbox').forEach(c => c.checked = false); const all = document.getElementById('selectAllCheckbox'); if (all) { all.checked = false; all.indeterminate = false; } refreshSelectionDisplay(); }
 
 // ── Refresh ──────────────────────────────────────────────────
 async function refreshData() {
-  const btn  = document.getElementById('btnRefresh');
-  const icon = btn.querySelector('i');
+  const btn  = document.getElementById('btnRefresh'); const icon = btn.querySelector('i');
   btn.disabled = true; icon.classList.add('spin'); showLoading();
   try {
     const d = await api('getData', { sheet: activeSheet, token: authToken });
@@ -1499,8 +1414,7 @@ async function refreshData() {
 
 // ── Utility ──────────────────────────────────────────────────
 function togglePwd(inputId, btn) {
-  const inp  = document.getElementById(inputId);
-  const icon = btn.querySelector('i');
+  const inp  = document.getElementById(inputId); const icon = btn.querySelector('i');
   if (inp.type === 'password') { inp.type='text'; icon.classList.replace('bi-eye','bi-eye-slash'); }
   else { inp.type='password'; icon.classList.replace('bi-eye-slash','bi-eye'); }
 }
