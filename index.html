@@ -623,7 +623,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbz4Pa9Nh-Z6JvsTtpbgoXBP
 
 let activeSheet  = 'Pekerjaan';
 let currentPage  = 'dashboard';
-const cache      = { Pekerjaan: null, "USULAN TEKNIS": null };
+const cache      = { Pekerjaan: null, ['Usulan Teknis']: null };
 let authToken    = null;
 let currentRole  = null;
 let loggedUsername = null;
@@ -632,7 +632,7 @@ let selectedRows = new Set();
 let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
 let sidebarCollapsed = false;
-const scrollPositions = { Pekerjaan: 0, "USULAN TEKNIS": 0 };
+const scrollPositions = { Pekerjaan: 0, ['Usulan Teknis']: 0 };
 let tableSortable;
 let bsTooltips = [];
 
