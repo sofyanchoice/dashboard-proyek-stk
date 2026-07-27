@@ -316,7 +316,7 @@
       <div class="nav-section-label">Halaman</div>
       <div class="nav-item-link active" data-page="dashboard" onclick="goToPage('dashboard')"><i class="bi bi-grid-1x2-fill"></i> <span class="link-label">Dashboard</span></div>
       <div class="nav-item-link" data-sheet="Pekerjaan" onclick="selectSheet('Pekerjaan')"><i class="bi bi-kanban-fill"></i> <span class="link-label">Pekerjaan</span></div>
-      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">USTEK</span></div>
+      <div class="nav-item-link" data-sheet="USTEK" onclick="selectSheet('USTEK')"><i class="bi bi-file-earmark-text-fill"></i> <span class="link-label">Usulan Teknis</span></div>
     </div>
     <div class="sidebar-account" id="sidebarAccount"></div>
   </div>
@@ -346,7 +346,7 @@
         <select id="dashSheetFilter" onchange="renderDashboard()">
           <option value="all">Semua Sheet Proyek</option>
           <option value="Pekerjaan">Hanya Pekerjaan</option>
-          <option value="USTEK">Hanya USTEK</option>
+          <option value="USTEK">Hanya Usulan Teknis</option>
         </select>
         <select id="dashYearFilter" onchange="renderDashboard()">
           <option value="all">Semua Tahun</option>
@@ -623,6 +623,7 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbz4Pa9Nh-Z6JvsTtpbgoXBP
 
 let activeSheet  = 'Pekerjaan';
 let currentPage  = 'dashboard';
+const SHEET_LABELS = { Pekerjaan: 'Pekerjaan', USTEK: 'Usulan Teknis' };
 const cache      = { Pekerjaan: null, USTEK: null };
 let authToken    = null;
 let currentRole  = null;
@@ -754,16 +755,20 @@ function goToPage(page) {
     updateSidebarActive({ page: 'dashboard' });
     document.getElementById('topbarTitle').textContent = 'Dashboard';
     document.getElementById('topbarSubtitle').textContent = 'Ringkasan proyek CV. Selaras Tirta Karya';
+    // Dashboard tidak mengingat filter sebelumnya — selalu kembali ke tampilan utama
+    // (semua pekerjaan, semua tahun) setiap kali halaman ini dibuka.
+    document.getElementById('dashSheetFilter').value = 'all';
+    document.getElementById('dashYearFilter').value = 'all';
     renderDashboard();
   }
   closeSidebarMobile();
 }
 function selectSheet(name) {
   updateSidebarActive({ sheet: name });
-  document.getElementById('topbarTitle').textContent = name;
+  document.getElementById('topbarTitle').textContent = SHEET_LABELS[name] || name;
   document.getElementById('topbarSubtitle').textContent = name === 'Pekerjaan'
     ? 'Daftar pekerjaan dan status penyelesaian'
-    : 'Dokumen dan checklist USTEK';
+    : 'Dokumen dan checklist Usulan Teknis';
   currentPage = 'table';
   document.getElementById('page-dashboard').style.display = 'none'; document.getElementById('page-table').style.display = ''; document.getElementById('fabAddBtn').classList.toggle('show', isAdmin);
   changeSheet(name); closeSidebarMobile();
@@ -842,6 +847,17 @@ function initDragAndDrop() {
   tableSortable = new Sortable(tbody, {
     handle: '.drag-handle', animation: 200, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
     multiDrag: true, selectedClass: 'is-selected', fallbackTolerance: 3,
+    onChoose: function(evt) {
+      // Batch reorder: kalau baris yang mulai di-drag adalah bagian dari
+      // data yang sudah dicentang (>1), ikutkan semua baris terpilih lain
+      // ke seleksi bawaan SortableJS supaya semuanya ikut ter-drag bersamaan.
+      const no = evt.item.dataset.no;
+      if (selectedRows.size > 1 && selectedRows.has(no)) {
+        document.querySelectorAll('#tableBody tr').forEach(tr => {
+          if (selectedRows.has(tr.dataset.no)) Sortable.utils.select(tr);
+        });
+      }
+    },
     onEnd: async function(evt) {
       // Ambil elemen yang benar-benar digeser secara spesifik dari event sekarang
       let draggedEls = [];
@@ -899,7 +915,7 @@ function renderTable(data) {
   tbody.innerHTML = '';
   data.forEach(row => {
     const isDone = row[5] === 'Done' || row[5] === 'done'; const noStr = String(row[0]); const editableCls = isAdmin ? 'editable' : ''; const statusHandler = isAdmin ? `onclick="openStatusEditor(event,'${noStr}')"` : '';
-    const pill = isDone ? `<span class="status-pill done ${editableCls}" ${statusHandler} data-bs-toggle="tooltip" title="Status: Done (Selesai)"><i class="bi bi-check-circle"></i>Done</span>` : `<span class="status-pill ongoing ${editableCls}" ${statusHandler} data-bs-toggle="tooltip" title="Status: Ongoing (Berjalan)"><i class="bi bi-arrow-repeat"></i>Ongoing</span>`;
+    const pill = isDone ? `<span class="status-pill done ${editableCls}" ${statusHandler}><i class="bi bi-check-circle"></i>Done</span>` : `<span class="status-pill ongoing ${editableCls}" ${statusHandler}><i class="bi bi-arrow-repeat"></i>Ongoing</span>`;
     const isColl = row[6] === true || row[6] === 'TRUE'; const isUp = row[7] === true || row[7] === 'TRUE'; const collHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','collected')"` : ''; const upHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','uploaded')"` : '';
     const ic = isColl ? `<i class="bi bi-file-earmark-check-fill text-success ${editableCls}" ${collHandler} data-bs-toggle="tooltip" title="Dokumen sudah Collected"></i>` : `<i class="bi bi-file-earmark text-muted ${editableCls}" ${collHandler} data-bs-toggle="tooltip" title="Dokumen belum Collected"></i>`;
     const iu = isUp ? `<i class="bi bi-cloud-check-fill text-primary ${editableCls}" ${upHandler} data-bs-toggle="tooltip" title="Dokumen ter-Upload ke NAS"></i>` : `<i class="bi bi-cloud-slash text-muted ${editableCls}" ${upHandler} data-bs-toggle="tooltip" title="Dokumen belum di-Upload"></i>`;
@@ -922,13 +938,13 @@ function renderTable(data) {
       <td data-label="No" class="align-middle">
         <div class="d-flex align-items-center justify-content-md-center justify-content-end fw-bold">${dragHandle} <span>${row[0]}</span></div>
       </td>
-      <td data-label="Judul Pekerjaan" class="td-wrap fw-semibold" data-bs-toggle="tooltip" title="${row[1]}">${row[1]}</td>
-      <td data-label="Tahun" class="text-center align-middle" data-bs-toggle="tooltip" title="Tahun Proyek: ${row[2]}">${row[2]}</td>
-      <td data-label="Jenis" class="td-wrap align-middle" data-bs-toggle="tooltip" title="Jenis: ${row[3]}">${row[3]}</td>
+      <td data-label="Judul Pekerjaan" class="td-wrap fw-semibold">${row[1]}</td>
+      <td data-label="Tahun" class="text-center align-middle">${row[2]}</td>
+      <td data-label="Jenis" class="td-wrap align-middle">${row[3]}</td>
       <td data-label="PIC" class="align-middle">${renderPicAvatars(row[4])}</td>
       <td data-label="Status" class="text-center align-middle">${pill}</td>
       <td data-label="Checklist" class="align-middle"><div class="checklist-icons">${ic}${iu}</div></td>
-      <td data-label="Keterangan" class="td-wrap text-muted" data-bs-toggle="tooltip" title="${row[8]||'Tidak ada keterangan'}">${row[8]||'-'}</td>
+      <td data-label="Keterangan" class="td-wrap text-muted">${row[8]||'-'}</td>
       ${aksiCell}
     `;
     const searchText = [row[0], row[1], row[2], row[3], row[4], isDone ? 'Done' : 'Ongoing', row[8]].filter(v => v !== undefined && v !== null).join(' ').toLowerCase(); tr.dataset.search = searchText; tbody.appendChild(tr);
