@@ -35,7 +35,6 @@
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
     
-    /* FIX MENU ACCOUNT TERPOTONG (BUG 3) */
     .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;}
     .account-menu{position:absolute;bottom:calc(100% + 5px);left:10px;right:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 4px 20px rgba(15,23,42,0.12);opacity:0;visibility:hidden;transform:translateY(10px);transition:all .2s ease;z-index:110;display:flex;flex-direction:column;gap:2px;}
     .sidebar-account.open .account-menu{opacity:1;visibility:visible;transform:translateY(0);}
@@ -49,7 +48,6 @@
     .sidebar-account.open .account-trigger i.bi-chevron-up{transform:rotate(180deg);}
     .account-menu .nav-item-link{margin-bottom:0;flex-shrink:0;}
 
-    /* Collapsed sidebar state */
     .sidebar.collapsed{width:var(--sidebar-w-collapsed);}
     .sidebar.collapsed .sidebar-brand{padding:20px 0;justify-content:center;}
     .sidebar.collapsed .brand-text,
@@ -79,7 +77,6 @@
     .role-badge.admin{background:var(--done-soft);color:var(--done);}
     .role-badge.user{background:var(--user-soft);color:var(--user-c);}
 
-    /* ── Cards & Global Form Tools ── */
     .card{border:1px solid var(--line);border-radius:14px;box-shadow:0 2px 4px rgba(15,23,42,.02);margin-bottom:20px;background:var(--surface);}
     .card-header{background:var(--surface);border-bottom:1px solid var(--line);border-radius:14px 14px 0 0 !important;padding:16px 20px;}
     .toggle-chip-group{display:flex;gap:10px;flex-wrap:wrap;}
@@ -95,19 +92,18 @@
     .search-box .btn{border:none;border-left:1px solid var(--line);border-radius:0;background:transparent;}
     .card-header .header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
-    /* ── FIXED TABLE LAYOUT & TEXT TRUNCATION (FITUR 3) ── */
+    /* ── FIXED TABLE LAYOUT & TEXT WRAPPED (DIUBAH AGAR BISA TURUN KE BAWAH) ── */
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
     #dataTable{table-layout:fixed;width:100%;min-width:1050px;margin-bottom:0;}
     #dataTable th, #dataTable td{vertical-align:middle;padding:12px 14px;font-size:.9rem;}
     
-    /* Force Truncation on Judul & Ket */
-    .td-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+    /* Mengubah kelas agar teks judul bisa wrapped sepenuhnya dan tidak terpotong */
+    .td-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
     
     #dataTable thead th{position:sticky;top:0;z-index:2;background:#f8fafc;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
     #dataTable tbody tr:hover{background:#f8fafc;}
     #dataTable tbody td{border-bottom:1px solid var(--line);}
 
-    /* Select Mode Check (Fitur 5: Edit Button diganti Hapus saat baris dipilih) */
     tr.is-selected { background-color: var(--brand-soft) !important; }
     tr.is-selected .btn-edit-action { display: none !important; }
     tr.is-selected .btn-delete-action { display: inline-flex !important; }
@@ -131,8 +127,6 @@
         display: flex; justify-content: space-between; align-items: center;
         border-bottom: 1px dashed var(--line); padding: 8px 0; text-align: right;
       }
-      /* Remove truncation for mobile view */
-      .td-truncate { white-space: normal; }
       #dataTable tbody td:last-child { border-bottom: none; }
       #dataTable tbody td::before { 
         content: attr(data-label); font-weight: 700; color: var(--ink-soft); 
@@ -141,7 +135,6 @@
       #dataTable tbody td:empty { display: none; }
     }
 
-    /* Drag and Drop styles */
     .drag-handle { cursor: grab; padding: 4px; border-radius: 4px; transition: background 0.15s; color: var(--ink-soft); }
     .drag-handle:hover { background: var(--canvas); color: var(--ink); }
     .drag-handle:active { cursor: grabbing; }
@@ -171,13 +164,11 @@
     .btn-edit-row{border:1px solid var(--line);background:var(--surface);color:var(--brand);width:34px;height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;}
     .btn-edit-row:hover{background:var(--brand-soft);}
 
-    /* ── PIC Avatars ── */
     .pic-avatars{display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px;}
     .pic-avatar-group{display:flex;align-items:center;}
     .pic-avatar{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.7rem;flex-shrink:0;border:2px solid var(--surface);cursor:default;}
     .pic-avatar-group .pic-avatar:not(:first-child){margin-left:-8px;}
 
-    /* ── Modals ── */
     .modal-content{border-radius:14px;border:none;box-shadow:0 20px 60px rgba(15,23,42,.28);}
     .modal-header{border-bottom:1px solid var(--line);}
     .modal-footer{border-top:1px solid var(--line);}
@@ -189,7 +180,6 @@
     #confirmModal .modal-content.is-danger{border-top:4px solid var(--danger);}
     #confirmModal .modal-content.is-primary{border-top:4px solid var(--brand);}
 
-    /* ── Login gate ── */
     #loginGate{position:fixed;inset:0;z-index:1050;background:linear-gradient(160deg,#eef2ff 0%,var(--canvas) 55%);display:flex;align-items:center;justify-content:center;padding:20px;}
     #loginGate.d-none{display:none!important;}
     .login-card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:32px 28px;box-shadow:0 12px 40px rgba(15,23,42,.10);}
@@ -201,13 +191,11 @@
     #gasBanner{background:#fef9c3;border:1px solid #fde68a;border-radius:10px;padding:14px 18px;margin-bottom:18px;font-size:.88rem;display:none;}
     #gasBanner.show{display:block;}
 
-    /* ── Global loading overlay ── */
     #globalLoadingOverlay{position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.55);backdrop-filter:blur(1px);display:none;align-items:center;justify-content:center;cursor:wait;}
     #globalLoadingOverlay.active{display:flex;}
     #globalLoadingOverlay .loading-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 32px;box-shadow:0 12px 32px rgba(15,23,42,.14);display:flex;align-items:center;gap:14px;}
     #globalLoadingOverlay .loading-box span{font-weight:700;color:var(--ink);font-size:.92rem;}
 
-    /* ── VISUAL DASHBOARD MENARIK (FITUR 6) ── */
     .hero-greet { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 14px; padding: 24px 28px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(37,99,235,0.06); border: 1px solid #bfdbfe; }
     .hero-greet h3 { font-weight: 800; color: #1e3a8a; margin-bottom: 4px; letter-spacing: -0.01em;}
     .hero-greet p { color: #3b82f6; font-weight: 600; margin: 0; display:flex; align-items: center; gap: 8px;}
@@ -244,12 +232,10 @@
     .year-row .year-bar-fill{height:100%;background: linear-gradient(90deg, var(--brand) 0%, #60a5fa 100%); border-radius:999px;transition:width .5s ease;}
     .year-row .year-count{width:34px;text-align:right;font-size:.82rem;color:var(--ink);font-weight:800;flex-shrink:0;}
 
-    /* ── FAB ── */
     .fab-btn{position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;border:none;display:none;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 8px 20px rgba(37,99,235,.35);z-index:1045;transition:transform .15s,background .15s;}
     .fab-btn:hover{transform:scale(1.06);background:#1d4ed8;color:#fff;}
     .fab-btn.show{display:flex;}
 
-    /* ── Floating add panel ── */
     .add-panel-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:1054;display:none;}
     .add-panel-backdrop.show{display:block;}
     .add-panel{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:92vw;background:var(--surface);z-index:1055;transform:translateX(100%);transition:transform .28s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(15,23,42,.18);}
@@ -258,7 +244,6 @@
     .add-panel-body{padding:20px 22px;overflow-y:auto;flex:1;}
     .add-panel-footer{padding:16px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;}
 
-    /* ── Toast ── */
     #toastContainer{position:fixed;top:20px;right:20px;z-index:2100;display:flex;flex-direction:column;gap:10px;max-width:360px;}
     .app-toast{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--brand);border-radius:10px;padding:12px 14px;box-shadow:0 8px 24px rgba(15,23,42,.14);font-size:.85rem;font-weight:600;color:var(--ink);animation:toastIn .2s ease;}
     .app-toast.app-toast-success{border-left-color:var(--done);}
@@ -273,7 +258,6 @@
     @keyframes toastIn{from{opacity:0;transform:translateX(24px);}to{opacity:1;transform:translateX(0);}}
     @keyframes toastOut{to{opacity:0;transform:translateX(24px);}}
 
-    /* ── Inline edit popovers ── */
     .inline-edit-pop{position:absolute;z-index:1600;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 28px rgba(15,23,42,.16);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:150px;}
     .inline-edit-pop button{display:flex;align-items:center;gap:8px;border:none;background:transparent;text-align:left;padding:8px 10px;border-radius:8px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;}
     .inline-edit-pop button:hover{background:var(--canvas);}
@@ -360,7 +344,6 @@
 
     <!-- PAGE: DASHBOARD -->
     <div id="page-dashboard">
-      <!-- 6. Visual Dashboard Lebih Estetik -->
       <div class="hero-greet">
         <h3 id="greetText">Selamat Datang, Admin!</h3>
         <p><i class="bi bi-calendar-event"></i> <span id="currentDate">Senin, 27 Juli 2026</span></p>
@@ -448,7 +431,6 @@
         </div>
         <div class="card-body p-0">
           <div class="table-shell" id="tableShell">
-            <!-- 3. Ukuran Tabel Fix & Pembatasan Text (Wrapped Handling) -->
             <table class="table table-hover mb-0" id="dataTable">
               <colgroup>
                 <col id="colSelect" style="width: 44px;">
@@ -623,7 +605,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- 4. Library SortableJS dengan Multiple Drag -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
 <script>
@@ -681,7 +662,6 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('confirmModal').addEventListener('hidden.bs.modal', () => { if (confirmResolver) { confirmResolver(false); confirmResolver = null; } });
   document.getElementById('tahun').value = new Date().getFullYear();
 
-  // Pencarian dengan Debounce
   let searchTimeout;
   document.getElementById('searchInput').addEventListener('input', function() {
     clearTimeout(searchTimeout); const val = this.value; document.getElementById('btnClearSearch').style.display = val ? '' : 'none';
@@ -690,20 +670,23 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!GAS_URL || GAS_URL.startsWith('GANTI')) { document.getElementById('gasBanner').classList.add('show'); }
   document.addEventListener('click', (e) => { if (!e.target.closest('.inline-edit-pop') && !e.target.closest('.editable')) { closeInlineEditPop(); } if (!e.target.closest('#sidebarAccount')) { document.getElementById('sidebarAccount')?.classList.remove('open'); } });
   document.getElementById('tableShell').addEventListener('scroll', function() { scrollPositions[activeSheet] = this.scrollTop; });
-  sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1'; applySidebarCollapsed(); attemptAutoLogin(); setGreetingDate();
+  sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1'; applySidebarCollapsed(); attemptAutoLogin();
 });
 
-// Tooltip Global (Fitur 1)
 function initTooltips() {
   bsTooltips.forEach(t => t.dispose()); bsTooltips = [];
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
   bsTooltips = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 }
 
-// Format Tanggal (Fitur 6)
 function setGreetingDate() {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', options);
+  const greetEl = document.getElementById('greetText');
+  const dateEl = document.getElementById('currentDate');
+  if (greetEl) greetEl.textContent = `Selamat Datang, ${loggedUsername || 'Admin'}!`;
+  if (dateEl) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    dateEl.textContent = new Date().toLocaleDateString('id-ID', options);
+  }
 }
 
 // ── Auth ────────────────────────────────────────────────────
@@ -740,7 +723,7 @@ async function logoutApp() { if (authToken) { try { await api('logout', { token:
 function switchUser() { logoutApp(); setTimeout(() => document.getElementById('loginUsername').focus(), 100); }
 
 function onAuthenticated() {
-  renderSidebarAccount(); document.getElementById('greetText').textContent = `Selamat Datang, ${loggedUsername || 'Admin'}!`;
+  renderSidebarAccount(); setGreetingDate();
   document.getElementById('colSelect').style.display = isAdmin ? '' : 'none';
   document.getElementById('thSelect').style.display = isAdmin ? '' : 'none';
   document.getElementById('colAksi').style.display = isAdmin ? '' : 'none';
@@ -777,7 +760,6 @@ function renderSidebarAccount() {
 }
 function toggleAccountMenu() { document.getElementById('sidebarAccount').classList.toggle('open'); }
 
-// ── Creds & Loaders ─────────────────────────────
 function openChangeCredModal() { document.getElementById('credForm').reset(); document.getElementById('credErr').style.display = 'none'; document.getElementById('credOk').style.display = 'none'; document.getElementById('cred_role').value = currentRole || 'admin'; document.getElementById('sidebarAccount')?.classList.remove('open'); credModal.show(); }
 async function submitChangeCred(e) {
   e.preventDefault(); const btn = document.getElementById('btnCredSubmit'); const errEl = document.getElementById('credErr'); const okEl = document.getElementById('credOk'); errEl.style.display = 'none'; okEl.style.display = 'none'; btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
@@ -800,7 +782,6 @@ function showConfirm(message, opts) {
 function showLoading() { document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" class="text-center py-5" style="border:none;"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fw-semibold mb-0">Memuat data...</p></td></tr>'; }
 function showError(msg) { document.getElementById('tableBody').innerHTML = `<tr><td colspan="10" class="text-center py-5 text-danger" style="border:none;"><i class="bi bi-exclamation-triangle fs-1 d-block mb-2"></i><p class="mb-0 fw-semibold">${msg}</p></td></tr>`; }
 
-// ── Render Data & UI ──────────────────────────────────────────
 async function changeSheet(name) {
   const shell = document.getElementById('tableShell'); scrollPositions[activeSheet] = shell.scrollTop; activeSheet = name; document.getElementById('searchInput').value = ''; document.getElementById('btnClearSearch').style.display = 'none'; clearSelection(); sortState = { column: null, direction: 'asc' }; updateSortIcons();
   if (cache[name]) { renderTable(cache[name]); } else { showLoading(); }
@@ -838,7 +819,6 @@ async function applyInlineChecklist(no, field, value) {
   try { let d; if (rows.length > 1) { d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue: null, collectedValue: field === 'collected' ? value : null, uploadedValue: field === 'uploaded' ? value : null }); } else { const row = rows[0]; d = await api('saveData', { sheetName: activeSheet, token: authToken, no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4], statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing', collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'), uploaded: field==='uploaded' ? value : (row[7]===true||row[7]==='TRUE'), keterangan: row[8]||'' }); } cache[activeSheet] = d; renderTable(d); renderDashboard(); showToast('Checklist berhasil diperbarui.', 'success'); } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading();
 }
 
-// ── Multi-Drag/Drop ───────────────────────────────────────
 function initDragAndDrop() {
   const tbody = document.getElementById('tableBody'); if (tableSortable) { tableSortable.destroy(); } if (!isAdmin) return;
   tableSortable = new Sortable(tbody, {
@@ -846,10 +826,9 @@ function initDragAndDrop() {
     multiDrag: true, selectedClass: 'is-selected', fallbackTolerance: 3,
     onEnd: async function(evt) {
       if (evt.oldIndex === evt.newIndex && (!evt.items || !evt.items.length)) return;
-      
       let draggedEls = (evt.items && evt.items.length > 0) ? evt.items : [evt.item];
       let fromNos = draggedEls.map(el => el.dataset.no);
-      let targetIndex = evt.newIndex; // Index baru dari urutan data di DOM
+      let targetIndex = evt.newIndex;
 
       if (fromNos.length > 1) {
         const ok = await showConfirm(`Pindahkan ${fromNos.length} data terpilih ke urutan baru?`, {title: 'Batch Move Data'});
@@ -881,7 +860,7 @@ function checkSortableState() {
   }
 }
 
-// ── Render Tabel (Tooltips disetiap kolom + Hapus saat selected) ──
+// ── Render Tabel (Judul sekarang menggunakan .td-wrap agar tidak terpotong) ──
 function renderTable(data) {
   const tbody = document.getElementById('tableBody');
   if (!data || data.length === 0) {
@@ -902,7 +881,6 @@ function renderTable(data) {
     const isSel = selectedRows.has(noStr);
     const selCell = isAdmin ? `<td data-label="Pilih" class="text-center align-middle"><input type="checkbox" class="row-select-checkbox" data-no="${noStr}" ${isSel?'checked':''} onchange="toggleRowSelect('${noStr}',this.checked)"></td>` : '';
     
-    // Fitur 5: Tampilkan Edit atau Delete berdasar status checkbox
     const aksiCell = isAdmin ? `<td data-label="Aksi" class="text-center align-middle">
       <button type="button" class="btn-edit-row btn-edit-action" onclick='editData(${JSON.stringify(row).replace(/'/g,"&apos;")})' data-bs-toggle="tooltip" title="Edit Data"><i class="bi bi-pencil-square"></i></button>
       <button type="button" class="btn-edit-row btn-delete-action border-danger text-danger bg-danger-subtle" onclick="deleteSelectedRows()" data-bs-toggle="tooltip" title="Hapus Data Terpilih" style="display:none;"><i class="bi bi-trash3"></i></button>
@@ -911,26 +889,25 @@ function renderTable(data) {
     const tr = document.createElement('tr'); tr.dataset.no = noStr; 
     if(isSel) tr.classList.add('is-selected');
 
-    // Mencegah ruang kosong (Fix Bug 2): letakkan handle dan No didalam satu flex element
     tr.innerHTML = `
       ${selCell}
       <td data-label="No" class="align-middle">
         <div class="d-flex align-items-center justify-content-md-center justify-content-end fw-bold">${dragHandle} <span>${row[0]}</span></div>
       </td>
-      <td data-label="Judul Pekerjaan" class="td-truncate fw-semibold" data-bs-toggle="tooltip" title="${row[1]}">${row[1]}</td>
+      <td data-label="Judul Pekerjaan" class="td-wrap fw-semibold" data-bs-toggle="tooltip" title="${row[1]}">${row[1]}</td>
       <td data-label="Tahun" class="text-center align-middle" data-bs-toggle="tooltip" title="Tahun Proyek: ${row[2]}">${row[2]}</td>
-      <td data-label="Jenis" class="td-truncate align-middle" data-bs-toggle="tooltip" title="Jenis: ${row[3]}">${row[3]}</td>
+      <td data-label="Jenis" class="td-wrap align-middle" data-bs-toggle="tooltip" title="Jenis: ${row[3]}">${row[3]}</td>
       <td data-label="PIC" class="align-middle">${renderPicAvatars(row[4])}</td>
       <td data-label="Status" class="text-center align-middle">${pill}</td>
       <td data-label="Checklist" class="align-middle"><div class="checklist-icons">${ic}${iu}</div></td>
-      <td data-label="Keterangan" class="td-truncate text-muted" data-bs-toggle="tooltip" title="${row[8]||'Tidak ada keterangan'}">${row[8]||'-'}</td>
+      <td data-label="Keterangan" class="td-wrap text-muted" data-bs-toggle="tooltip" title="${row[8]||'Tidak ada keterangan'}">${row[8]||'-'}</td>
       ${aksiCell}
     `;
     const searchText = [row[0], row[1], row[2], row[3], row[4], isDone ? 'Done' : 'Ongoing', row[8]].filter(v => v !== undefined && v !== null).join(' ').toLowerCase(); tr.dataset.search = searchText; tbody.appendChild(tr);
   });
   
   if (isAdmin) { updateSelectAllCheckbox(); initDragAndDrop(); }
-  filterTable(); initTooltips(); // Fix Bug 1B (Re-init tooltips)
+  filterTable(); initTooltips();
 }
 
 function renderDashboard() {
@@ -949,12 +926,9 @@ function renderDashboard() {
   else { yb.innerHTML = yearsSorted.map(y => `<div class="year-row"><span class="year-label">${y}</span><div class="year-bar-track"><div class="year-bar-fill" style="width:${(counts[y] / maxCount * 100)}%"></div></div><span class="year-count">${counts[y]}</span></div>`).join(''); }
 }
 
-// ── Smart Sort (Fitur 4) ────────────────────────────────────────────────────
 function sortByColumn(col, type) {
   const data = cache[activeSheet]; if (!data || !data.length) return;
-  // Langsung toggle berlawanan dan beri default pintar 
   const defaultDir = (type === 'number' || type === 'checklist') ? 'desc' : 'asc';
-  
   if (sortState.column === col) sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
   else { sortState.column = col; sortState.direction = defaultDir; }
   
@@ -978,7 +952,6 @@ function updateSortIcons() {
   });
 }
 
-// ── Proses Data Form ──────────────────────────────
 function openAddPanel() { if (!isAdmin) return; document.getElementById('addPanel').classList.add('open'); document.getElementById('addPanelBackdrop').classList.add('show'); }
 function closeAddPanel() { document.getElementById('addPanel').classList.remove('open'); document.getElementById('addPanelBackdrop').classList.remove('show'); document.getElementById('projectForm').reset(); document.getElementById('tahun').value = new Date().getFullYear(); }
 async function submitData(e) {
@@ -989,7 +962,7 @@ async function submitData(e) {
     judul: document.getElementById('judul').value, tahun: document.getElementById('tahun').value, jenis: document.getElementById('jenis').value, pic: document.getElementById('pic').value,
     statusPekerjaan: document.getElementById('statusPekerjaan').value, collected: document.getElementById('collected').checked, uploaded: document.getElementById('uploaded').checked, keterangan: document.getElementById('keterangan').value
   };
-  closeAddPanel(); // Panel ditutup duluan sebelum loading
+  closeAddPanel();
   showGlobalLoading('Menyimpan data proyek baru...');
   try {
     const d = await api('saveData', payload);
@@ -1020,7 +993,6 @@ async function deleteFromModal() {
   try { const d = await api('deleteData', { sheetName: activeSheet, nos: no, token: authToken }); cache[activeSheet] = d; clearSelection(); renderTable(d); renderDashboard(); showToast('Data berhasil dihapus.', 'success'); } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading(); isDeletingRow = false;
 }
 
-// ── Batch Delete Function ──────────────────────────────
 async function deleteSelectedRows() {
   if (!isAdmin || selectedRows.size === 0) return;
   const arrNos = Array.from(selectedRows);
@@ -1036,7 +1008,6 @@ async function deleteSelectedRows() {
   hideGlobalLoading();
 }
 
-// ── Filter Data ──────────────────────────────────────────
 function filterTable() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim(); const rows = document.getElementById('tableBody').getElementsByTagName('tr'); let vis = 0;
   for (let r of rows) { const haystack = r.dataset.search !== undefined ? r.dataset.search : r.textContent.toLowerCase(); const show = !q || haystack.includes(q); r.style.display = show ? '' : 'none'; if (show) vis++; }
