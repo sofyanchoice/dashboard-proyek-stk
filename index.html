@@ -33,10 +33,12 @@
     .nav-item-link:hover{background:var(--canvas);color:var(--ink);}
     .nav-item-link.active{background:var(--brand-soft);color:var(--brand);}
     .nav-item-link i{font-size:1.05rem;width:20px;text-align:center;flex-shrink:0;}
-    
-    .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;}
-    .account-menu{position:absolute;bottom:calc(100% + 5px);left:10px;right:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 4px 20px rgba(15,23,42,0.12);opacity:0;visibility:hidden;transform:translateY(10px);transition:all .2s ease;z-index:110;display:flex;flex-direction:column;gap:2px;}
-    .sidebar-account.open .account-menu{opacity:1;visibility:visible;transform:translateY(0);}
+
+    /* ── Account section: "geser ke atas" (accordion, mendorong isi ke atas),
+         bukan popup melayang di atas konten lain ── */
+    .sidebar-account{border-top:1px solid var(--line);padding:10px;position:relative;flex-shrink:0;}
+    .account-menu{max-height:0;overflow:hidden;display:flex;flex-direction:column;gap:2px;transition:max-height .25s ease,margin-bottom .25s ease;}
+    .sidebar-account.open .account-menu{max-height:220px;margin-bottom:6px;}
     .sidebar.collapsed .account-menu{display:none;}
     .account-trigger{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;user-select:none;transition:background .15s;}
     .account-trigger:hover{background:var(--canvas);}
@@ -61,7 +63,11 @@
     .main-wrapper{margin-left:var(--sidebar-w);flex:1;min-width:0;padding:24px;transition:margin-left .22s ease;}
     .sidebar.collapsed ~ .main-wrapper{margin-left:var(--sidebar-w-collapsed);}
     .app-topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
-    
+
+    /* Tombol hamburger (mobile) — disembunyikan secara default di desktop.
+       Hanya dimunculkan lewat media query di bawah untuk layar sempit. */
+    .sidebar-toggle-btn{display:none;}
+
     @media(max-width:900px){
       .sidebar{transform:translateX(-100%);width:var(--sidebar-w) !important;}
       .sidebar.open{transform:translateX(0);}
@@ -95,9 +101,9 @@
     .table-shell{max-height:560px;overflow-y:auto;overflow-x:auto;}
     #dataTable{table-layout:fixed;width:100%;min-width:1050px;margin-bottom:0;}
     #dataTable th, #dataTable td{vertical-align:middle;padding:12px 14px;font-size:.9rem;}
-    
+
     .td-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
-    
+
     #dataTable thead th{position:sticky;top:0;z-index:2;background:#f8fafc;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
     #dataTable tbody tr:hover{background:#f8fafc;}
     #dataTable tbody td{border-bottom:1px solid var(--line);}
@@ -112,22 +118,22 @@
       .card-header .header-actions{flex-wrap:wrap;}
       .card-header .header-actions .filtered-count{order:-1;width:100%;text-align:left;}
       .card-header .header-actions .search-box{flex:1 1 100%;}
-      
+
       #dataTable { min-width: 100%; display:block;}
       #dataTable thead { display: none; }
-      #dataTable tbody tr { 
-        display: flex; flex-direction: column; 
-        border: 1px solid var(--line); border-radius: 12px; 
+      #dataTable tbody tr {
+        display: flex; flex-direction: column;
+        border: 1px solid var(--line); border-radius: 12px;
         margin: 10px 14px; padding: 12px; background: var(--surface);
         box-shadow: 0 2px 4px rgba(15,23,42,0.03);
       }
-      #dataTable tbody td { 
+      #dataTable tbody td {
         display: flex; justify-content: space-between; align-items: center;
         border-bottom: 1px dashed var(--line); padding: 8px 0; text-align: right;
       }
       #dataTable tbody td:last-child { border-bottom: none; }
-      #dataTable tbody td::before { 
-        content: attr(data-label); font-weight: 700; color: var(--ink-soft); 
+      #dataTable tbody td::before {
+        content: attr(data-label); font-weight: 700; color: var(--ink-soft);
         text-align: left; margin-right: 15px; font-size: 0.85rem;
       }
       #dataTable tbody td:empty { display: none; }
@@ -197,7 +203,7 @@
     .hero-greet { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 14px; padding: 24px 28px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(37,99,235,0.06); border: 1px solid #bfdbfe; }
     .hero-greet h3 { font-weight: 800; color: #1e3a8a; margin-bottom: 4px; letter-spacing: -0.01em;}
     .hero-greet p { color: #3b82f6; font-weight: 600; margin: 0; display:flex; align-items: center; gap: 8px;}
-    
+
     .dash-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
     .dash-filters select{border-radius:8px;border:1px solid var(--line);padding:8px 12px;font-size:.85rem;font-weight:600;background:var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
     .dash-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px;}
@@ -207,7 +213,7 @@
     .dash-card.t-done::after { background: var(--done); }
     .dash-card.t-ongoing::after { background: var(--ongoing); }
     .dash-card.t-purple::after { background: var(--user-c); }
-    
+
     .dash-card .dash-icon { width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-size: 1.1rem; margin-bottom: 12px;}
     .dash-card.t-brand .dash-icon { background: var(--brand-soft); color: var(--brand); }
     .dash-card.t-done .dash-icon { background: var(--done-soft); color: var(--done); }
@@ -624,7 +630,7 @@ let isDeletingRow = false;
 let sortState    = { column: null, direction: 'asc' };
 let sidebarCollapsed = false;
 const scrollPositions = { Pekerjaan: 0, USTEK: 0 };
-let tableSortable; 
+let tableSortable;
 let bsTooltips = [];
 
 const TOKEN_KEY  = 'stkAuthToken'; const ROLE_KEY = 'stkAuthRole'; const USER_KEY = 'stkAuthUsername'; const REMEMBER_KEY = 'stkRemember'; const SIDEBAR_KEY = 'stkSidebarCollapsed';
@@ -741,11 +747,21 @@ function applySidebarCollapsed() { document.getElementById('sidebar').classList.
 function updateSidebarActive({ page, sheet }) { document.querySelectorAll('.sidebar-nav .nav-item-link').forEach(el => { const match = (page && el.dataset.page === page) || (sheet && el.dataset.sheet === sheet); el.classList.toggle('active', !!match); }); }
 function goToPage(page) {
   currentPage = page; document.getElementById('page-dashboard').style.display = page === 'dashboard' ? '' : 'none'; document.getElementById('page-table').style.display = page === 'table' ? '' : 'none'; document.getElementById('fabAddBtn').classList.toggle('show', isAdmin && page === 'table');
-  if (page === 'dashboard') { updateSidebarActive({ page: 'dashboard' }); document.getElementById('topbarTitle').textContent = 'Dashboard'; renderDashboard(); }
+  if (page === 'dashboard') {
+    updateSidebarActive({ page: 'dashboard' });
+    document.getElementById('topbarTitle').textContent = 'Dashboard';
+    document.getElementById('topbarSubtitle').textContent = 'Ringkasan proyek CV. Selaras Tirta Karya';
+    renderDashboard();
+  }
   closeSidebarMobile();
 }
 function selectSheet(name) {
-  updateSidebarActive({ sheet: name }); document.getElementById('topbarTitle').textContent = name; currentPage = 'table';
+  updateSidebarActive({ sheet: name });
+  document.getElementById('topbarTitle').textContent = name;
+  document.getElementById('topbarSubtitle').textContent = name === 'Pekerjaan'
+    ? 'Daftar pekerjaan dan status penyelesaian'
+    : 'Dokumen dan checklist USTEK';
+  currentPage = 'table';
   document.getElementById('page-dashboard').style.display = 'none'; document.getElementById('page-table').style.display = ''; document.getElementById('fabAddBtn').classList.toggle('show', isAdmin);
   changeSheet(name); closeSidebarMobile();
 }
@@ -817,11 +833,22 @@ async function applyInlineChecklist(no, field, value) {
   try { let d; if (rows.length > 1) { d = await api('batchUpdate', { sheetName: activeSheet, nos: rows.map(r => r[0]), token: authToken, statusValue: null, collectedValue: field === 'collected' ? value : null, uploadedValue: field === 'uploaded' ? value : null }); } else { const row = rows[0]; d = await api('saveData', { sheetName: activeSheet, token: authToken, no: row[0], judul: row[1], tahun: row[2], jenis: row[3], pic: row[4], statusPekerjaan: (row[5]==='Done'||row[5]==='done') ? 'Done' : 'Ongoing', collected: field==='collected' ? value : (row[6]===true||row[6]==='TRUE'), uploaded: field==='uploaded' ? value : (row[7]===true||row[7]==='TRUE'), keterangan: row[8]||'' }); } cache[activeSheet] = d; renderTable(d); renderDashboard(); showToast('Checklist berhasil diperbarui.', 'success'); } catch (err) { showToast('Gagal: ' + err.message, 'danger'); } hideGlobalLoading();
 }
 
+// ── Drag & drop reorder — mendukung batch reorder untuk baris yang sudah diseleksi ──
 function initDragAndDrop() {
   const tbody = document.getElementById('tableBody'); if (tableSortable) { tableSortable.destroy(); } if (!isAdmin) return;
   tableSortable = new Sortable(tbody, {
     handle: '.drag-handle', animation: 200, ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
     multiDrag: true, selectedClass: 'is-selected', fallbackTolerance: 3,
+    onChoose: function(evt) {
+      // Jika baris yang mulai di-drag adalah bagian dari data yang sudah dicentang (>1),
+      // ikutkan semua baris terpilih lain ke dalam drag ini (batch reorder).
+      const no = evt.item.dataset.no;
+      if (selectedRows.size > 1 && selectedRows.has(no)) {
+        document.querySelectorAll('#tableBody tr').forEach(tr => {
+          if (selectedRows.has(tr.dataset.no)) Sortable.utils.select(tr);
+        });
+      }
+    },
     onEnd: async function(evt) {
       if (evt.oldIndex === evt.newIndex && (!evt.items || !evt.items.length)) return;
       let draggedEls = (evt.items && evt.items.length > 0) ? evt.items : [evt.item];
@@ -832,7 +859,7 @@ function initDragAndDrop() {
         const ok = await showConfirm(`Pindahkan ${fromNos.length} data terpilih ke urutan baru?`, {title: 'Batch Move Data'});
         if(!ok) { renderTable(cache[activeSheet]); return; }
       }
-      
+
       showGlobalLoading('Memindahkan urutan data...');
       try {
         const d = await api('reorder', { sheetName: activeSheet, fromNos: fromNos, newIndex: targetIndex, token: authToken });
@@ -864,7 +891,7 @@ function renderTable(data) {
     tbody.innerHTML = `<tr><td colspan="10" class="text-center py-5" style="border:none;"><svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" class="text-muted mb-3" style="opacity:0.35;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="12" y2="17"></line></svg><h5 class="text-muted fw-bold">Belum Ada Data</h5><p class="text-muted small mb-0">Tekan tombol tambah ( + ) untuk memasukkan data baru ke dalam proyek.</p></td></tr>`;
     document.getElementById('filteredCount').style.display = 'none'; if(tableSortable) tableSortable.destroy(); return;
   }
-  
+
   tbody.innerHTML = '';
   data.forEach(row => {
     const isDone = row[5] === 'Done' || row[5] === 'done'; const noStr = String(row[0]); const editableCls = isAdmin ? 'editable' : ''; const statusHandler = isAdmin ? `onclick="openStatusEditor(event,'${noStr}')"` : '';
@@ -872,18 +899,18 @@ function renderTable(data) {
     const isColl = row[6] === true || row[6] === 'TRUE'; const isUp = row[7] === true || row[7] === 'TRUE'; const collHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','collected')"` : ''; const upHandler = isAdmin ? `onclick="openChecklistEditor(event,'${noStr}','uploaded')"` : '';
     const ic = isColl ? `<i class="bi bi-file-earmark-check-fill text-success ${editableCls}" ${collHandler} data-bs-toggle="tooltip" title="Dokumen sudah Collected"></i>` : `<i class="bi bi-file-earmark text-muted ${editableCls}" ${collHandler} data-bs-toggle="tooltip" title="Dokumen belum Collected"></i>`;
     const iu = isUp ? `<i class="bi bi-cloud-check-fill text-primary ${editableCls}" ${upHandler} data-bs-toggle="tooltip" title="Dokumen ter-Upload ke NAS"></i>` : `<i class="bi bi-cloud-slash text-muted ${editableCls}" ${upHandler} data-bs-toggle="tooltip" title="Dokumen belum di-Upload"></i>`;
-    
+
     const dragHandle = isAdmin ? `<span class="drag-handle text-muted me-2" data-bs-toggle="tooltip" title="Tarik untuk memindahkan urutan baris ini"><i class="bi bi-grip-vertical"></i></span>` : '';
-    
+
     const isSel = selectedRows.has(noStr);
     const selCell = isAdmin ? `<td data-label="Pilih" class="text-center align-middle"><input type="checkbox" class="row-select-checkbox" data-no="${noStr}" ${isSel?'checked':''} onchange="toggleRowSelect('${noStr}',this.checked)"></td>` : '';
-    
+
     const aksiCell = isAdmin ? `<td data-label="Aksi" class="text-center align-middle">
       <button type="button" class="btn-edit-row btn-edit-action" onclick='editData(${JSON.stringify(row).replace(/'/g,"&apos;")})' data-bs-toggle="tooltip" title="Edit Data"><i class="bi bi-pencil-square"></i></button>
       <button type="button" class="btn-edit-row btn-delete-action border-danger text-danger bg-danger-subtle" onclick="deleteSelectedRows()" data-bs-toggle="tooltip" title="Hapus Data Terpilih" style="display:none;"><i class="bi bi-trash3"></i></button>
     </td>` : '';
-    
-    const tr = document.createElement('tr'); tr.dataset.no = noStr; 
+
+    const tr = document.createElement('tr'); tr.dataset.no = noStr;
     if(isSel) tr.classList.add('is-selected');
 
     tr.innerHTML = `
@@ -902,7 +929,7 @@ function renderTable(data) {
     `;
     const searchText = [row[0], row[1], row[2], row[3], row[4], isDone ? 'Done' : 'Ongoing', row[8]].filter(v => v !== undefined && v !== null).join(' ').toLowerCase(); tr.dataset.search = searchText; tbody.appendChild(tr);
   });
-  
+
   if (isAdmin) { updateSelectAllCheckbox(); initDragAndDrop(); }
   filterTable(); initTooltips();
 }
@@ -914,7 +941,7 @@ function renderDashboard() {
   yearSel.innerHTML = '<option value="all">Semua Tahun</option>' + years.map(y => `<option value="${y}">${y}</option>`).join(''); yearSel.value = years.includes(keepYear) ? keepYear : 'all';
   let rows = baseRows; if (yearSel.value !== 'all') rows = rows.filter(r => String(r[2]) === yearSel.value);
   const total = rows.length; const done = rows.filter(r => r[5] === 'Done' || r[5] === 'done').length; const ongoing = total - done; const collected = rows.filter(r => r[6] === true || r[6] === 'TRUE').length; const uploaded = rows.filter(r => r[7] === true || r[7] === 'TRUE').length;
-  document.getElementById('dashTotal').textContent = total; document.getElementById('dashDone').textContent = done; document.getElementById('dashOngoing').textContent = ongoing; document.getElementById('dashCollected').textContent = collected; document.getElementById('dashUploaded').textContent = uploaded;
+  document.getElementById('dashTotal').textContent = total; document.getElementById('dashDone').textContent = done; document.getElementById('dashOngoing').textContent = ongoing; document.getElementById('dashUploaded').textContent = uploaded;
   const donePct = total ? Math.round((done / total) * 100) : 0; const collPct = total ? Math.round((collected / total) * 100) : 0; const upPct = total ? Math.round((uploaded / total) * 100) : 0;
   document.getElementById('pbDone').style.width = donePct + '%'; document.getElementById('pbDone').textContent = donePct + '%'; document.getElementById('pbCollected').style.width = collPct + '%'; document.getElementById('pbCollected').textContent = collPct + '%'; document.getElementById('pbUploaded').style.width = upPct + '%'; document.getElementById('pbUploaded').textContent = upPct + '%';
   const counts = {}; baseRows.forEach(r => { const y = String(r[2] || '-'); counts[y] = (counts[y] || 0) + 1; });
@@ -928,7 +955,7 @@ function sortByColumn(col, type) {
   const defaultDir = (type === 'number' || type === 'checklist') ? 'desc' : 'asc';
   if (sortState.column === col) sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
   else { sortState.column = col; sortState.direction = defaultDir; }
-  
+
   const dir = sortState.direction === 'asc' ? 1 : -1;
   data.sort((a, b) => {
     if (type === 'number') return (Number(a[col]||0) - Number(b[col]||0)) * dir;
@@ -953,7 +980,7 @@ function openAddPanel() { if (!isAdmin) return; document.getElementById('addPane
 function closeAddPanel() { document.getElementById('addPanel').classList.remove('open'); document.getElementById('addPanelBackdrop').classList.remove('show'); document.getElementById('projectForm').reset(); document.getElementById('tahun').value = new Date().getFullYear(); }
 async function submitData(e) {
   e.preventDefault(); if (!isAdmin) return; const btn = document.getElementById('btnSubmit'); btn.disabled = true;
-  
+
   const payload = {
     sheetName: activeSheet, no: '', token: authToken,
     judul: document.getElementById('judul').value, tahun: document.getElementById('tahun').value, jenis: document.getElementById('jenis').value, pic: document.getElementById('pic').value,
@@ -995,7 +1022,7 @@ async function deleteSelectedRows() {
   const arrNos = Array.from(selectedRows);
   const ok = await showConfirm(`Yakin ingin menghapus ${arrNos.length} data terpilih secara permanen?`, { title: 'Hapus Batch Data', okText: 'Ya, Hapus Semua', danger: true });
   if (!ok) return;
-  
+
   showGlobalLoading(`Menghapus ${arrNos.length} baris data...`);
   try {
     const d = await api('deleteData', { sheetName: activeSheet, nos: arrNos, token: authToken });
@@ -1017,11 +1044,11 @@ function updateFilteredCountDisplay(vis, totalRows, q) {
   if (n > 0) { cEl.style.display = ''; cEl.classList.add('selection-mode'); cEl.innerHTML = `${n} data dipilih <button type="button" class="clear-selection-btn" onclick="clearSelection()" title="Batalkan pilihan"><i class="bi bi-x-lg"></i></button>`; } else if (q) { cEl.style.display = ''; cEl.classList.remove('selection-mode'); cEl.textContent = `Menampilkan ${vis} dari ${totalRows}`; } else { cEl.style.display = 'none'; cEl.classList.remove('selection-mode'); }
 }
 
-function toggleRowSelect(no, checked) { 
-  if (checked) selectedRows.add(String(no)); else selectedRows.delete(String(no)); 
+function toggleRowSelect(no, checked) {
+  if (checked) selectedRows.add(String(no)); else selectedRows.delete(String(no));
   const tr = document.querySelector(`tr[data-no="${no}"]`);
   if(tr) tr.classList.toggle('is-selected', checked);
-  updateSelectAllCheckbox(); refreshSelectionDisplay(); 
+  updateSelectAllCheckbox(); refreshSelectionDisplay();
 }
 function toggleSelectAll(cb) {
   const checked = cb.checked;
